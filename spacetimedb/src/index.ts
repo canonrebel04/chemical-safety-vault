@@ -417,6 +417,7 @@ export const logDeadlineReminder = spacetimedb.reducer(
 export const generateSafetyAudit = spacetimedb.reducer(
   (ctx) => {
     const shop_id = getShopId(ctx);
+    const shop = ctx.db.shops.id.find(shop_id);
     const thirtyDaysInMs = BigInt(30 * 24 * 60 * 60 * 1000);
     const thirtyDaysAgoMillis = ctx.timestamp.toMillis() - thirtyDaysInMs;
     
@@ -427,19 +428,40 @@ export const generateSafetyAudit = spacetimedb.reducer(
     const deadlines = Array.from(ctx.db.compliance_deadlines.shop_id.filter(shop_id));
 
     const auditReport = {
+      report_title: "Chemical Safety Log Vault - OSHA Compliance Report",
       generated_at: ctx.timestamp.toISOString(),
+      shop_name: shop?.name || "Unknown Shop",
       shop_id: shop_id.toHexString(),
-      spills_count: spills.length,
-      inventory_total: inventory.length,
-      active_deadlines: deadlines.filter((d: any) => d.status === "Pending").length,
-      details: {
-        spills,
-        inventory,
-        deadlines
+      summary: {
+        total_chemicals: inventory.length,
+        spills_last_30_days: spills.length,
+        active_deadlines: deadlines.filter((d: any) => d.status === "Pending").length,
+        overdue_deadlines: deadlines.filter((d: any) => d.status === "Pending" && d.dueDate.toMillis() < ctx.timestamp.toMillis()).length,
+      },
+      data: {
+        inventory: inventory.map((i: any) => ({
+          name: i.name,
+          cas: i.casNumber,
+          quantity: `${i.quantity} ${i.unit}`,
+          location: i.location
+        })),
+        spills: spills.map((s: any) => ({
+          date: s.date.toISOString(),
+          amount: s.amountSpilled,
+          description: s.description,
+          actions: s.actionsTaken
+        })),
+        deadlines: deadlines.map((d: any) => ({
+          type: d.type,
+          description: d.description,
+          due_date: d.dueDate.toISOString(),
+          status: d.status
+        }))
       }
     };
 
-    logAction(ctx, shop_id, "GENERATE_AUDIT", `Safety audit report generated.`);
-    console.info(JSON.stringify(auditReport, null, 2));
+    const snapshot = JSON.stringify(auditReport, null, 2);
+    logAction(ctx, shop_id, "FULL_SAFETY_AUDIT", snapshot);
+    console.info("Full Safety Audit generated and logged.");
   }
 );

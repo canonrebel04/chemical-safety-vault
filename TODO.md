@@ -1,22 +1,21 @@
-# TODO: Chemical Safety Vault Deadline System
+# TODO: Chemical Safety Vault Audit Generation
 
-- [x] **1. Backend Logic & Audit Logging** `[backend]` `[database]`
-  - [x] Implement `logDeadlineReminder(deadline_id: u32, message: string)` reducer in `spacetimedb/src/index.ts`.
-  - [x] Add explanatory comments for external cron trigger strategy (`cron-job.org`).
-- [x] **2. Frontend Hook: useDeadlineChecker** `[frontend]`
-  - [x] Create `client/src/hooks/useDeadlineChecker.ts`.
-  - [x] Implement scanning logic for `compliance_deadlines` (Overdue vs Upcoming).
-  - [x] Implement a `processedDeadlines` ref to prevent duplicate notifications in a single session.
-- [x] **3. Notification System Integration** `[frontend]`
-  - [x] Add Browser Notification API permission request logic.
-  - [x] Implement `showNotification` helper using both native Push and shadcn/ui Toast.
-  - [x] Integrate the `logDeadlineReminder` reducer call into the notification flow.
-- [x] **4. Core Application Integration** `[frontend]`
-  - [x] Register the `useDeadlineChecker` hook in `client/src/App.tsx` or `AuthProvider`.
-  - [x] Add a visual "Notifications Enabled/Disabled" indicator in the Dashboard or Team page.
-- [x] **5. Verification & Finalization** `[test]`
+- [x] **1. Backend: Enhanced Audit Logic** `[backend]` `[database]`
+  - [x] Refactor `generateSafetyAudit` reducer in `spacetimedb/src/index.ts`:
+    - [x] Add logic to compile full shop state (Inventory, Spills, Deadlines).
+    - [x] Implement automatic insertion of audit JSON snapshot into `audit_logs` table with action type `FULL_SAFETY_AUDIT`.
+- [x] **2. Frontend: Export Library Setup** `[frontend]` `[parallel]`
+  - [x] Install dependencies: `npm install jspdf jspdf-autotable` in `client/`.
+  - [x] Create a utility helper `client/src/lib/pdf-generator.ts` for OSHA report formatting.
+- [x] **3. Frontend: Export for OSHA UI** `[frontend]`
+  - [x] Update `client/src/pages/Audits.tsx`:
+    - [x] Add "Export for OSHA" button.
+    - [x] Implement logic to trigger `generateSafetyAudit` and then process the data into a PDF.
+    - [x] Add a loading/processing state for the export action.
+
+- [x] **4. Verification & Finalization** `[test]`
   - [x] Regenerate client bindings: `npm run spacetime:generate`.
-  - [x] Manually test notification trigger with a mock 1-minute deadline.
-  - [x] Verify that `audit_logs` correctly records each notification.
+  - [x] Verify that the audit snapshot is correctly stored in the `audit_logs` table.
+  - [x] Perform an end-to-end test: Generate audit -> Download PDF -> Verify content.
   - [x] Run production build: `npm run build`.
-  - [x] Commit changes with message: `deadline system live`.
+  - [x] Commit changes with message: `audit generation complete`.
