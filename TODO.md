@@ -15,5 +15,5 @@
 - [x] 5. Landing Page & Routing
     - [x] Add basic landing page with "Chemical Safety Log Vault" text
     - [x] Add "Launch App" button to `/dashboard`
-- [ ] 6. Initial Commit
-    - [ ] Stage and commit with message "initial spacetime scaffold + PWA"
+- [x] 6. Initial Commit
+    - [x] Stage and commit with message "initial spacetime scaffold + PWA"
