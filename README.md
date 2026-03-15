@@ -18,25 +18,11 @@ Managing chemical safety data in a fast-paced workshop environment is critical y
 - 📶 **Offline-First (PWA)**: Full offline caching for forms and logs—essential for environments with spotty connectivity.
 - 🛡️ **Workshop Optimized**: Streamlined UI for auto-parts and small blender shops using **Tailwind CSS** and **shadcn/ui**.
 - 🔐 **Secure Logs**: Immutable database logs ensure safety compliance and audit readiness.
-
-### What makes it unique?
-Unlike generic logbooks, this vault is built on a "multiplayer" database engine (SpacetimeDB), allowing instant updates across all devices in the shop without traditional REST API overhead.
+- 💰 **Built-in Billing**: Integrated Stripe checkout for premium features.
 
 ---
 
-## 🗺️ Table of Contents
-1. [Installation](#-installation)
-2. [Quick Start](#-quick-start)
-3. [Folder Structure](#-folder-structure)
-4. [Configuration](#-configuration)
-5. [Development](#-development)
-6. [Testing](#-testing)
-7. [Roadmap](#-roadmap)
-8. [License](#-license)
-
----
-
-## ⚙️ Installation
+## ⚙️ Installation & Development
 
 ### Prerequisites
 - [SpacetimeDB CLI](https://spacetimedb.com/docs/getting-started/installation)
@@ -50,133 +36,65 @@ Unlike generic logbooks, this vault is built on a "multiplayer" database engine 
    cd chemical-safety-vault
    ```
 
-2. **Install Frontend Dependencies:**
+2. **Install Dependencies:**
    ```bash
-   cd client
-   npm install
+   cd client && npm install
+   cd ../spacetimedb && npm install
    ```
 
-3. **Install Backend Dependencies:**
+3. **Run Locally:**
    ```bash
-   cd ../spacetimedb
-   npm install
-   ```
-
----
-
-## 🚀 Quick Start
-
-To launch the development environment:
-
-1. **Start SpacetimeDB Backend:**
-   ```bash
-   # From the project root
+   # From project root, start SpacetimeDB
    spacetime dev --module-path spacetimedb
+   
+   # In another terminal, start React
+   cd client && npm run dev
    ```
-
-2. **Launch React Frontend:**
-   ```bash
-   cd client
-   npm run dev
-   ```
-
-3. **Verify:**
-   Open `http://localhost:5173` in your browser. You should see the landing page. Click **"Launch App"** to enter the dashboard.
 
 ---
 
-## 📂 Folder Structure
+## 🚀 Deployment
 
-```text
-.
-├── client/                     # React + Vite (Frontend)
-│   ├── public/                 # PWA Manifest & Assets
-│   ├── src/                    # UI & Logic
-│   │   ├── components/ui/      # shadcn/ui components
-│   │   ├── lib/utils.ts        # Tailwind utility functions
-│   │   ├── App.tsx             # Main routing & UI
-│   │   └── main.tsx            # PWA registration
-│   ├── tailwind.config.js      # Tailwind configuration
-│   └── vite.config.ts          # Vite/TypeScript setup
-├── spacetimedb/                # SpacetimeDB Module (Backend)
-│   └── src/index.ts            # Tables and Reducers definition
-└── spacetime.json              # Global project configuration
-```
+To deploy to SpacetimeDB Maincloud:
+
+1. **Publish Backend:**
+   ```bash
+   spacetime publish --server maincloud chemical-safety-vault --module-path spacetimedb
+   ```
+
+2. **Generate Bindings:**
+   ```bash
+   cd client && npm run spacetime:generate
+   ```
+
+3. **Deploy Frontend:**
+   Upload the `client/dist` folder to your static hosting provider (e.g., Netlify, Vercel, or AWS S3 + CloudFront).
 
 ---
 
 ## 🛠️ Configuration
 
 ### Environment Variables
-Create a `client/.env.local` file (automatically generated during init):
-- `VITE_SPACETIMEDB_HOST`: URL of your SpacetimeDB instance (default: `ws://localhost:3000`)
-- `VITE_SPACETIMEDB_DB_NAME`: The name of your database.
+Create a `client/.env.local` file:
+- `VITE_SPACETIMEDB_HOST`: URL of your SpacetimeDB instance (e.g., `wss://maincloud.spacetimedb.com`)
+- `VITE_SPACETIMEDB_DB_NAME`: `chemical-safety-vault`
+- `VITE_STRIPE_PUBLISHABLE_KEY`: Your Stripe Test/Live key.
+- `VITE_S3_PUBLIC_URL`: Base URL for SDS document access.
 
 ---
 
-## 💻 Development
+## 📦 Data Portability & Compliance
 
-### Key Tech Stack
-- **Frontend**: React (TypeScript), Vite, Tailwind CSS, shadcn/ui.
-- **State Management**: Zustand, SpacetimeDB React hooks.
-- **Backend**: SpacetimeDB (TypeScript module).
-- **PWA**: Custom Service Worker and Web Manifest.
-
-### Build the Project
-```bash
-# Frontend
-cd client && npm run build
-
-# Backend
-cd spacetimedb && npm run build
-```
-
----
-
-## 🧪 Testing
-
-The project includes a verification suite to ensure scaffold integrity.
-
-### Run Tests
-```bash
-# Check client build and dependencies
-cd client && npm run build
-
-# Check backend build
-cd spacetimedb && npm run build
-```
-*A detailed test plan is maintained in `TEST.md`.*
-
----
-
-## 🛣️ Roadmap
-- [ ] **SDS Scanner**: Upload and parse Safety Data Sheets automatically.
-- [ ] **Inventory Integration**: Track chemical levels and auto-order replacements.
-- [ ] **Team Roles**: Permission-based access for shop managers and technicians.
-- [ ] **Export Reports**: Generate OSHA-compliant safety reports in PDF/CSV.
-
----
-
-## 🤝 Contributing
-
-1. Fork the Project
-2. Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your Changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the Branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
+Chemical Safety Vault prioritizes data ownership. All shop data can be exported at any time from the **Audits** page:
+- **OSHA Reports**: Professional PDF summaries of the last 30 days.
+- **CSV Exports**: Raw data for Inventory, Spills, and Deadlines.
+- **Full Vault (JSON)**: Complete data dump for compliance audits.
 
 ---
 
 ## ⚖️ License
 
-Distributed under the **ISC License**. See `client/LICENSE` for more information.
-
----
-
-## 📬 Support & Contact
-
-- **Issue Tracker**: [GitHub Issues](https://github.com/yourusername/chemical-safety-vault/issues)
-- **Support**: Reach out via the issue tracker for bugs or feature requests.
+Distributed under the **ISC License**.
 
 ---
 

@@ -9,9 +9,11 @@ import { Textarea } from '@/components/ui/textarea';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { Plus, Droplets } from 'lucide-react';
+import { Plus, Droplets, Loader2 } from 'lucide-react';
 import { useTable, useReducer } from 'spacetimedb/react';
 import { tables, reducers } from '@/module_bindings';
+import { offlineManager } from '@/lib/offline-drafts';
+import { toast } from 'sonner';
 
 const formSchema = z.object({
   chemicalId: z.string().min(1, 'Please select a chemical'),
@@ -31,6 +33,7 @@ export default function Spills() {
   const inventory = allInventory.filter(i => i.shopId.toHexString() === user?.shopId.toHexString());
   const spills = allSpills.filter(s => s.shopId.toHexString() === user?.shopId.toHexString());
   const [isAddOpen, setIsAddOpen] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const logSpill = useReducer(reducers.logSpill);
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -44,16 +47,34 @@ export default function Spills() {
     },
   });
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    logSpill({
+  async function onSubmit(values: z.infer<typeof formSchema>) {
+    const data = {
       chemicalId: parseInt(values.chemicalId, 10),
       amountSpilled: parseFloat(values.amountSpilled),
       description: values.description,
       actionsTaken: values.actionsTaken,
       witnesses: values.witnesses || ''
-    });
-    setIsAddOpen(false);
-    form.reset();
+    };
+
+    if (!navigator.onLine) {
+      offlineManager.saveDraft('spill', data);
+      toast.success('Offline: Saved as draft');
+      setIsAddOpen(false);
+      form.reset();
+      return;
+    }
+
+    setIsSubmitting(true);
+    try {
+      await logSpill(data);
+      setIsAddOpen(false);
+      form.reset();
+      toast.success('Spill logged successfully');
+    } catch (error) {
+      toast.error('Failed to log spill');
+    } finally {
+      setIsSubmitting(false);
+    }
   }
 
   return (
@@ -153,7 +174,10 @@ export default function Spills() {
                   )}
                 />
 
-                <Button type="submit" variant="destructive" className="w-full">Submit Report</Button>
+                <Button type="submit" variant="destructive" className="w-full" disabled={isSubmitting}>
+                  {isSubmitting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+                  Submit Report
+                </Button>
               </form>
             </Form>
           </DialogContent>

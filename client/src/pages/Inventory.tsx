@@ -7,9 +7,11 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { Package, Plus, QrCode } from 'lucide-react';
+import { Package, Plus, QrCode, Loader2 } from 'lucide-react';
 import { useTable, useReducer } from 'spacetimedb/react';
 import { tables, reducers } from '@/module_bindings';
+import { offlineManager } from '@/lib/offline-drafts';
+import { toast } from 'sonner';
 
 const formSchema = z.object({
   casNumber: z.string().min(1, 'CAS Number is required'),
@@ -26,6 +28,7 @@ export default function Inventory() {
   const allInventory: any[] = (useTable(tables.chemical_inventory) as any) || [];
   const inventory = allInventory.filter(i => i.shopId.toHexString() === user?.shopId.toHexString());
   const [isAddOpen, setIsAddOpen] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const addInventoryItem = useReducer(reducers.addInventoryItem);
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -39,16 +42,34 @@ export default function Inventory() {
     },
   });
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    addInventoryItem({
+  async function onSubmit(values: z.infer<typeof formSchema>) {
+    const data = {
       casNumber: values.casNumber,
       name: values.name,
       quantity: parseFloat(values.quantity),
       unit: values.unit,
       location: values.location
-    });
-    setIsAddOpen(false);
-    form.reset();
+    };
+
+    if (!navigator.onLine) {
+      offlineManager.saveDraft('inventory', data);
+      toast.success('Offline: Saved as draft');
+      setIsAddOpen(false);
+      form.reset();
+      return;
+    }
+
+    setIsSubmitting(true);
+    try {
+      await addInventoryItem(data);
+      setIsAddOpen(false);
+      form.reset();
+      toast.success('Item added successfully');
+    } catch (error) {
+      toast.error('Failed to add item');
+    } finally {
+      setIsSubmitting(false);
+    }
   }
 
   return (
@@ -134,7 +155,10 @@ export default function Inventory() {
                     </FormItem>
                   )}
                 />
-                <Button type="submit" className="w-full">Add Item</Button>
+                <Button type="submit" className="w-full" disabled={isSubmitting}>
+                  {isSubmitting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+                  Add Item
+                </Button>
               </form>
             </Form>
           </DialogContent>

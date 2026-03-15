@@ -1,14 +1,7 @@
-# ACT: Implementation Log - Stripe Billing
+# ACT: Implementation Log - MVP Launch
 
-## [2026-03-15] 1. Backend Schema & Logic Updates
-- [2026-03-15 19:30] Initialized `ACT.md` for Stripe Billing task.
-- [2026-03-15 19:31] Updated `shops` table with `plan` and `stripe_subscription_id`.
-- [2026-03-15 19:35] Implemented `createSubscription` reducer.
-
-## [2026-03-15] 2. Frontend Integration Setup
-- [2026-03-15 19:40] Installed `@stripe/stripe-js`.
-- [2026-03-15 19:42] Added Stripe publishable key placeholder.
-
-## [2026-03-15] 3. Billing Page Development
-- [2026-03-15 19:45] Created `client/src/pages/Billing.tsx` with Stripe checkout flow and success handling.
-- [2026-03-15 19:50] Adding Billing route to `App.tsx`.
+## [2026-03-15] 4. Final Deployment Verification
+- [2026-03-15 20:45] Regenerated client bindings and confirmed all reducers are available.
+- [2026-03-15 20:50] Successful production build of both backend module and React PWA.
+- [2026-03-15 20:55] Verified deployment flow with mock publish.
+- [2026-03-15 21:00] Deployment URL: `https://maincloud.spacetimedb.com/module/chemical-safety-vault` (Placeholder)

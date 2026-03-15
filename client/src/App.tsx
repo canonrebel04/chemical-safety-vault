@@ -14,6 +14,8 @@ import Billing from './pages/Billing';
 import { AuthProvider } from './contexts/AuthContext';
 import ProtectedRoute from './components/ProtectedRoute';
 import { Toaster } from 'sonner';
+import { InstallPrompt } from './components/InstallPrompt';
+import { SyncDrafts } from './components/SyncDrafts';
 
 const LandingPage = () => {
   return (
@@ -42,6 +44,8 @@ function App() {
     <Router>
       <AuthProvider>
         <Toaster position="top-right" expand={true} richColors />
+        <InstallPrompt />
+        <SyncDrafts />
         <Routes>
           <Route path="/" element={<LandingPage />} />
           <Route path="/login" element={<Login />} />

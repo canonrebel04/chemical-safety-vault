@@ -6,6 +6,7 @@ import { useTable, useReducer } from 'spacetimedb/react';
 import { tables, reducers } from '@/module_bindings';
 import { useAuth } from '@/contexts/AuthContext';
 import { generateOSHAReport, AuditData } from '@/lib/pdf-generator';
+import { convertToCSV, downloadFile } from '@/lib/export-utils';
 import { toast } from 'sonner';
 
 export default function Audits() {
@@ -15,12 +16,43 @@ export default function Audits() {
   
   const generateSafetyAudit = useReducer(reducers.generateSafetyAudit);
   const allLogs: any[] = (useTable(tables.audit_logs) as any) || [];
+  const allInventory: any[] = (useTable(tables.chemical_inventory) as any) || [];
+  const allSpills: any[] = (useTable(tables.spill_reports) as any) || [];
+  const allDeadlines: any[] = (useTable(tables.compliance_deadlines) as any) || [];
   
+  const shopId = user?.shopId.toHexString();
   const shopLogs = allLogs
-    .filter(l => l.shopId.toHexString() === user?.shopId.toHexString())
+    .filter(l => l.shopId.toHexString() === shopId)
     .sort((a, b) => Number(b.timestamp.toMillis()) - Number(a.timestamp.toMillis()));
 
+  const inventory = allInventory.filter(i => i.shopId.toHexString() === shopId);
+  const spills = allSpills.filter(s => s.shopId.toHexString() === shopId);
+  const deadlines = allDeadlines.filter(d => d.shopId.toHexString() === shopId);
+
   const latestAuditLog = shopLogs.find(l => l.action === "FULL_SAFETY_AUDIT");
+
+  const handleExportCSV = (data: any[], fileName: string) => {
+    if (data.length === 0) {
+      toast.error(`No ${fileName} data to export.`);
+      return;
+    }
+    const csv = convertToCSV(data);
+    downloadFile(csv, `${fileName}_${new Date().toISOString().split('T')[0]}.csv`, 'text/csv');
+    toast.success(`${fileName} CSV exported.`);
+  };
+
+  const handleExportFullJSON = () => {
+    const fullData = {
+      shopId,
+      exportedAt: new Date().toISOString(),
+      inventory,
+      spills,
+      deadlines,
+      activityLogs: shopLogs.map(l => ({ ...l, details: l.action === 'FULL_SAFETY_AUDIT' ? 'JSON Snapshot' : l.details }))
+    };
+    downloadFile(JSON.stringify(fullData, null, 2), `Vault_Full_Export_${new Date().toISOString().split('T')[0]}.json`, 'application/json');
+    toast.success("Full data JSON exported.");
+  };
 
   const handleGenerate = async () => {
     setIsGenerating(true);
@@ -108,6 +140,29 @@ export default function Audits() {
             >
               {isExporting ? <Loader2 className="h-4 w-4 animate-spin" /> : <Download className="h-4 w-4" />}
               Export for OSHA
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Raw Data Portability</CardTitle>
+          <CardDescription>Export your raw records for external backup or compliance analysis.</CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="grid grid-cols-1 gap-3">
+            <Button variant="outline" onClick={() => handleExportCSV(inventory, 'Inventory')} className="justify-start">
+              <Download className="mr-2 h-4 w-4" /> Export Inventory (CSV)
+            </Button>
+            <Button variant="outline" onClick={() => handleExportCSV(spills, 'Spills')} className="justify-start">
+              <Download className="mr-2 h-4 w-4" /> Export Spills (CSV)
+            </Button>
+            <Button variant="outline" onClick={() => handleExportCSV(deadlines, 'Deadlines')} className="justify-start">
+              <Download className="mr-2 h-4 w-4" /> Export Deadlines (CSV)
+            </Button>
+            <Button variant="secondary" onClick={handleExportFullJSON} className="justify-start mt-2">
+              <FileJson className="mr-2 h-4 w-4" /> Export Full Vault (JSON)
             </Button>
           </div>
         </CardContent>
