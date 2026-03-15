@@ -12,6 +12,7 @@ import Login from './pages/Login';
 import Team from './pages/Team';
 import { AuthProvider } from './contexts/AuthContext';
 import ProtectedRoute from './components/ProtectedRoute';
+import { Toaster } from 'sonner';
 
 const LandingPage = () => {
   return (
@@ -39,6 +40,7 @@ function App() {
   return (
     <Router>
       <AuthProvider>
+        <Toaster position="top-right" expand={true} richColors />
         <Routes>
           <Route path="/" element={<LandingPage />} />
           <Route path="/login" element={<Login />} />

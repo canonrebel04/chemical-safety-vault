@@ -387,6 +387,33 @@ export const createDeadline = spacetimedb.reducer(
   }
 );
 
+/**
+ * Log that a deadline reminder was sent.
+ */
+export const logDeadlineReminder = spacetimedb.reducer(
+  { deadline_id: t.u32(), message: t.string() },
+  (ctx, { deadline_id, message }) => {
+    const shop_id = getShopId(ctx);
+    // Verify deadline belongs to shop
+    const deadline = ctx.db.compliance_deadlines.id.find(deadline_id);
+    if (!deadline || deadline.shop_id.toHexString() !== shop_id.toHexString()) {
+      throw new Error("Deadline not found or unauthorized");
+    }
+
+    logAction(ctx, shop_id, "DEADLINE_REMINDER", `Reminder sent for deadline ID ${deadline_id}: ${message}`);
+  }
+);
+
+/**
+ * PRODUCTION CRON STRATEGY:
+ * To automate deadline checks in production, use a service like cron-job.org (free tier).
+ * 1. Implement a public (or shared secret) reducer or an HTTP endpoint (when available in SpacetimeDB).
+ * 2. Schedule cron-job.org to hit that endpoint every 24 hours.
+ * 3. The triggered logic will scan all shops and log reminders/send emails.
+ * 
+ * For now, the system relies on client-side triggers when the app is opened.
+ */
+
 export const generateSafetyAudit = spacetimedb.reducer(
   (ctx) => {
     const shop_id = getShopId(ctx);

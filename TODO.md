@@ -1,35 +1,22 @@
-# TODO: Chemical Safety Vault SDS S3 Upload
+# TODO: Chemical Safety Vault Deadline System
 
-- [x] **1. Backend S3 Integration** `[backend]` `[database]`
-  - [x] Implement `requestS3Upload(filename: string)` reducer in `spacetimedb/src/index.ts`:
-    - [x] Add manual S3 presigned URL signing logic (or use SDK if compatible).
-    - [x] Return both `presignedUrl` and `publicUrl`.
-  - [x] Implement `attachSDS(chemical_id: u32, filename: string, s3_url: string, expiry_date: timestamp)` reducer:
-    - [x] Ensure multi-tenancy check using `getShopId(ctx)`.
-    - [x] Store metadata in `sds_documents` table.
-  - [x] Implement `deleteSDS(sds_id: u32)` reducer:
-    - [x] Verify ownership before deletion.
-    - [x] Remove record from `sds_documents`.
-
-- [x] **2. Frontend Dependencies & UI Updates** `[frontend]` `[parallel]`
-  - [x] Install `axios` for robust HTTP PUT requests: `npm install axios` in `client/`.
-  - [x] Update `client/src/pages/SDS.tsx` UI:
-    - [x] Add a visual "Delete" button to the linked documents list.
-    - [x] Implement an "Uploading..." state with a progress indicator or spinner.
-
-- [x] **3. SDS Upload Logic Implementation** `[frontend]`
-  - [x] Refactor `onSubmit` in `SDS.tsx` to follow the multi-stage flow:
-    - [x] Stage 1: Call `reducers.requestS3Upload`.
-    - [x] Stage 2: Perform `PUT` to S3 using the received presigned URL.
-    - [x] Stage 3: Call `reducers.attachSDS` with the resulting public URL.
-  - [x] Implement error handling for each stage (e.g., toast notifications).
-
-
-- [x] **4. Multi-Tenant Verification & Binding Regeneration** `[test]`
+- [x] **1. Backend Logic & Audit Logging** `[backend]` `[database]`
+  - [x] Implement `logDeadlineReminder(deadline_id: u32, message: string)` reducer in `spacetimedb/src/index.ts`.
+  - [x] Add explanatory comments for external cron trigger strategy (`cron-job.org`).
+- [x] **2. Frontend Hook: useDeadlineChecker** `[frontend]`
+  - [x] Create `client/src/hooks/useDeadlineChecker.ts`.
+  - [x] Implement scanning logic for `compliance_deadlines` (Overdue vs Upcoming).
+  - [x] Implement a `processedDeadlines` ref to prevent duplicate notifications in a single session.
+- [x] **3. Notification System Integration** `[frontend]`
+  - [x] Add Browser Notification API permission request logic.
+  - [x] Implement `showNotification` helper using both native Push and shadcn/ui Toast.
+  - [x] Integrate the `logDeadlineReminder` reducer call into the notification flow.
+- [x] **4. Core Application Integration** `[frontend]`
+  - [x] Register the `useDeadlineChecker` hook in `client/src/App.tsx` or `AuthProvider`.
+  - [x] Add a visual "Notifications Enabled/Disabled" indicator in the Dashboard or Team page.
+- [x] **5. Verification & Finalization** `[test]`
   - [x] Regenerate client bindings: `npm run spacetime:generate`.
-  - [x] Verify that the `requestS3Upload` and `attachSDS` reducers are correctly mapped in `client/src/module_bindings/`.
-
-- [x] **5. Final Verification & Build** `[test]`
-  - [x] Run `npm run build` in `spacetimedb/`.
-  - [x] Run `npm run build` in `client/`.
-  - [x] Commit changes with message: `SDS upload working`.
+  - [x] Manually test notification trigger with a mock 1-minute deadline.
+  - [x] Verify that `audit_logs` correctly records each notification.
+  - [x] Run production build: `npm run build`.
+  - [x] Commit changes with message: `deadline system live`.

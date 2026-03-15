@@ -6,7 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Form, FormControl, FormField, FormItem, FormMessage } from '@/components/ui/form';
-import { Users, UserPlus, Copy, Check, LogOut } from 'lucide-react';
+import { Users, UserPlus, Copy, Check, LogOut, Bell, BellOff } from 'lucide-react';
 import { useTable, useReducer } from 'spacetimedb/react';
 import { tables, reducers } from '@/module_bindings';
 import { useAuth } from '@/contexts/AuthContext';
@@ -28,6 +28,16 @@ export default function Team() {
   const acceptInvite = useReducer(reducers.acceptInvite);
   
   const [copied, setCopied] = useState(false);
+  const [notificationPermission, setNotificationPermission] = useState<NotificationPermission>(
+    typeof window !== 'undefined' ? Notification.permission : 'default'
+  );
+
+  const requestPermission = async () => {
+    if ('Notification' in window) {
+      const permission = await Notification.requestPermission();
+      setNotificationPermission(permission);
+    }
+  };
 
   const inviteForm = useForm<z.infer<typeof inviteSchema>>({
     resolver: zodResolver(inviteSchema),
@@ -74,6 +84,26 @@ export default function Team() {
           Logout
         </Button>
       </div>
+
+      <Card>
+        <CardHeader className="flex flex-row items-center justify-between space-y-0">
+          <div>
+            <CardTitle>Notifications</CardTitle>
+            <CardDescription>Stay updated on compliance deadlines.</CardDescription>
+          </div>
+          {notificationPermission === 'granted' ? (
+            <div className="flex items-center text-green-500 text-sm font-medium">
+              <Bell className="mr-2 h-4 w-4" />
+              Enabled
+            </div>
+          ) : (
+            <Button variant="outline" size="sm" onClick={requestPermission} className="text-orange-500">
+              <BellOff className="mr-2 h-4 w-4" />
+              Enable
+            </Button>
+          )}
+        </CardHeader>
+      </Card>
 
       <Card>
         <CardHeader>

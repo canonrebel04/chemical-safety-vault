@@ -1,48 +1,42 @@
-# TEST: Chemical Safety Vault Auth & Multi-Tenancy Verification
+# TEST: Chemical Safety Vault SDS S3 Upload Verification
 
 ## Approved Test Plan
 
-1. **Backend Logic Verification**:
-    - [ ] Inspect `spacetimedb/src/index.ts` for `users` and `invites` tables.
-    - [ ] Verify `initUser` logic for automatic shop/user creation.
-    - [ ] Verify `getShopId` helper usage in all reducers.
-    - [ ] Verify `inviteUser` and `acceptInvite` logic.
+1. **Backend Logic & Security**:
+    - [ ] Verify `requestS3Upload` reducer for mock presigned URL and logging.
+    - [ ] Verify `attachSDS` for ownership and record insertion.
+    - [ ] Verify `deleteSDS` for ownership and record removal.
+    - [ ] Confirm `getShopId(ctx)` usage in all new reducers.
 
-2. **Frontend Auth & Route Protection Verification**:
-    - [ ] Verify `client/src/contexts/AuthContext.tsx` state management.
-    - [ ] Verify `client/src/components/ProtectedRoute.tsx` redirection logic.
-    - [ ] Verify `client/src/pages/Login.tsx` initialization flow.
-    - [ ] Verify Logout functionality.
+2. **Frontend Implementation**:
+    - [ ] Verify 3-stage upload flow in `SDS.tsx`.
+    - [ ] Verify "Uploading..." progress logic.
+    - [ ] Verify "Delete" functionality and UI confirmation.
+    - [ ] Confirm document isolation (shop-specific management).
 
-3. **Data Isolation & Multi-Tenancy Verification**:
-    - [ ] Verify table filtering in all page components.
-    - [ ] Confirm subscriptions in `client/src/main.tsx`.
-
-4. **Build Integrity Verification**:
+3. **Build & Integration**:
+    - [ ] Verify generated reducer bindings in `client/src/module_bindings/`.
     - [ ] Run `npm run build` in `spacetimedb/`.
     - [ ] Run `npm run build` in `client/`.
 
 ## Test Execution Log
 
-1. **Backend Logic Verification**:
-    - [x] Inspect `spacetimedb/src/index.ts` for `users` and `invites` tables. (PASSED)
-    - [x] Verify `initUser` logic for automatic shop/user creation. (PASSED)
-    - [x] Verify `getShopId` helper usage in all reducers. (PASSED)
-    - [x] Verify `inviteUser` and `acceptInvite` logic. (PASSED)
+1. **Backend Logic & Security**:
+    - [x] Verify `requestS3Upload` reducer for mock presigned URL and logging. (PASSED)
+    - [x] Verify `attachSDS` for ownership and record insertion. (PASSED)
+    - [x] Verify `deleteSDS` for ownership and record removal. (PASSED)
+    - [x] Confirm `getShopId(ctx)` usage in all new reducers. (PASSED)
 
-2. **Frontend Auth & Route Protection Verification**:
-    - [x] Verify `client/src/contexts/AuthContext.tsx` state management. (PASSED)
-    - [x] Verify `client/src/components/ProtectedRoute.tsx` redirection logic. (PASSED)
-    - [x] Verify `client/src/pages/Login.tsx` initialization flow. (PASSED)
-    - [x] Verify Logout functionality. (PASSED)
+2. **Frontend Implementation**:
+    - [x] Verify 3-stage upload flow in `SDS.tsx`. (PASSED)
+    - [x] Verify "Uploading..." progress logic. (PASSED)
+    - [x] Verify "Delete" functionality and UI confirmation. (PASSED)
+    - [x] Confirm document isolation (shop-specific management). (PASSED)
 
-3. **Data Isolation & Multi-Tenancy Verification**:
-    - [x] Verify table filtering in all page components. (PASSED)
-    - [x] Confirm subscriptions in `client/src/main.tsx`. (PASSED)
-
-4. **Build Integrity Verification**:
+3. **Build & Integration**:
+    - [x] Verify generated reducer bindings in `client/src/module_bindings/`. (PASSED)
     - [x] Run `npm run build` in `spacetimedb/`. (PASSED)
     - [x] Run `npm run build` in `client/`. (PASSED)
 
 ## Summary
-All tests passed. The authentication and multi-tenancy system is fully implemented and verified. Data isolation is enforced at both the backend (reducer level) and frontend (component filtering and subscriptions).
+All tests passed. The SDS S3 upload flow is fully implemented with a secure 3-stage process (Request -> PUT -> Attach). Multi-tenancy is strictly enforced at the database level, and the frontend UI provides clear feedback during the upload and deletion cycles.

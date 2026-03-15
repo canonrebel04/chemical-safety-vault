@@ -1,9 +1,11 @@
 import { Link, Outlet, useLocation } from 'react-router-dom';
 import { Home, Package, ShieldAlert, FileText, Calendar, Users } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useDeadlineChecker } from '@/hooks/useDeadlineChecker';
 
 export default function Layout() {
   const location = useLocation();
+  useDeadlineChecker();
 
   const navItems = [
     { name: 'Dashboard', path: '/dashboard', icon: Home },

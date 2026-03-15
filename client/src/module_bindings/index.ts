@@ -43,6 +43,7 @@ import DeleteSdsReducer from "./delete_sds_reducer";
 import GenerateSafetyAuditReducer from "./generate_safety_audit_reducer";
 import InitUserReducer from "./init_user_reducer";
 import InviteUserReducer from "./invite_user_reducer";
+import LogDeadlineReminderReducer from "./log_deadline_reminder_reducer";
 import LogSpillReducer from "./log_spill_reducer";
 import RequestS3UploadReducer from "./request_s_3_upload_reducer";
 import UpdateQuantityReducer from "./update_quantity_reducer";
@@ -200,6 +201,7 @@ const reducersSchema = __reducers(
   __reducerSchema("generate_safety_audit", GenerateSafetyAuditReducer),
   __reducerSchema("init_user", InitUserReducer),
   __reducerSchema("invite_user", InviteUserReducer),
+  __reducerSchema("log_deadline_reminder", LogDeadlineReminderReducer),
   __reducerSchema("log_spill", LogSpillReducer),
   __reducerSchema("request_s_3_upload", RequestS3UploadReducer),
   __reducerSchema("update_quantity", UpdateQuantityReducer),
