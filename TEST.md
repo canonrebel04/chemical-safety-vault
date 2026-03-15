@@ -1,38 +1,46 @@
-# TEST: Chemical Safety Vault Schema Expansion
+# TEST: Chemical Safety Vault Mobile-First UI Verification
 
 ## Approved Test Plan
 
-1. **Schema Integrity Verification**:
-    - [ ] Inspect `spacetimedb/src/index.ts` to ensure all 6 tables are defined with requested columns, types, and indexes.
-    - [ ] Verify `shop_id` (or `owner`) presence in every table for multi-tenancy.
+1. **UI Foundation & Theme**:
+    - [ ] Verify `client/index.html` enables dark mode.
+    - [ ] Verify `client/src/components/Layout.tsx` bottom navigation.
+    - [ ] Verify routes in `client/src/App.tsx`.
 
-2. **Reducer Logic & Multi-Tenancy Verification**:
-    - [ ] Verify `createShop` sets `id` and `owner` to `ctx.sender`.
-    - [ ] Verify all data-modifying reducers enforce multi-tenancy using `ctx.sender`.
-    - [ ] Verify `generateSafetyAudit` filters by shop and time (30 days).
-    - [ ] Verify `logAction` utilization for `audit_logs`.
+2. **SpacetimeDB Integration**:
+    - [ ] Confirm subscriptions in `client/src/main.tsx`.
 
-3. **Build & Integration Verification**:
-    - [ ] Run `npm run build` in `spacetimedb/`.
-    - [ ] Verify generated files in `client/src/module_bindings/`.
-    - [ ] Run `npm run build` in `client/`.
+3. **Page Logic & Data Binding**:
+    - [ ] Dashboard metrics and inventory hooks.
+    - [ ] Inventory Add Item form binding.
+    - [ ] SDS upload and link logic.
+    - [ ] Spills reporting form.
+    - [ ] Deadlines management.
+    - [ ] Audits generation trigger.
+
+4. **Build Integrity**:
+    - [ ] Run production build (`npm run build`).
 
 ## Test Execution Log
 
-1. **Schema Integrity Verification**:
-    - [x] Inspect `spacetimedb/src/index.ts` to ensure all 6 tables are defined with requested columns, types, and indexes. (PASSED)
-    - [x] Verify `shop_id` (or `owner`) presence in every table for multi-tenancy. (PASSED)
+1. **UI Foundation & Theme**:
+    - [x] Verify `client/index.html` enables dark mode. (PASSED)
+    - [x] Verify `client/src/components/Layout.tsx` bottom navigation. (PASSED)
+    - [x] Verify routes in `client/src/App.tsx`. (PASSED)
 
-2. **Reducer Logic & Multi-Tenancy Verification**:
-    - [x] Verify `createShop` sets `id` and `owner` to `ctx.sender`. (PASSED)
-    - [x] Verify all data-modifying reducers enforce multi-tenancy using `ctx.sender`. (PASSED)
-    - [x] Verify `generateSafetyAudit` filters by shop and time (30 days). (PASSED)
-    - [x] Verify `logAction` utilization for `audit_logs`. (PASSED)
+2. **SpacetimeDB Integration**:
+    - [x] Confirm subscriptions in `client/src/main.tsx`. (PASSED)
 
-3. **Build & Integration Verification**:
-    - [x] Run `npm run build` in `spacetimedb/`. (PASSED)
-    - [x] Verify generated files in `client/src/module_bindings/`. (PASSED)
-    - [x] Run `npm run build` in `client/`. (PASSED)
+3. **Page Logic & Data Binding**:
+    - [x] Dashboard metrics and inventory hooks. (PASSED)
+    - [x] Inventory Add Item form binding. (PASSED)
+    - [x] SDS upload and link logic. (PASSED)
+    - [x] Spills reporting form. (PASSED)
+    - [x] Deadlines management. (PASSED)
+    - [x] Audits generation trigger. (PASSED)
+
+4. **Build Integrity**:
+    - [x] Run production build (`npm run build`). (PASSED)
 
 ## Summary
-All tests passed. The SpacetimeDB schema expansion is correctly implemented with robust multi-tenancy enforcement and successful frontend integration.
+All tests passed. The mobile-first PWA UI is fully implemented, correctly integrated with SpacetimeDB real-time features, and passes all build checks.
