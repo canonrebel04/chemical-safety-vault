@@ -1,46 +1,69 @@
-# Plan: Chemical Safety Vault Schema Expansion
+# Plan: Chemical Safety Vault Mobile-First UI
 
-This plan outlines the steps to define the core database schema for the Chemical Safety Vault, implementing multi-tenancy and safety-focused reducers.
+This plan details the implementation of a mobile-first Progressive Web App (PWA) client for the Chemical Safety Vault using React, Tailwind CSS, shadcn/ui, and SpacetimeDB real-time subscriptions.
 
-## 1. Schema Definition (`spacetimedb/src/index.ts`)
+## 1. Project Setup & Architecture
+- **Theme**: Set dark mode as the default in `tailwind.config.js` and `index.css`.
+- **Navigation**: Implement a mobile-first, React Native-style bottom navigation bar connecting the core views.
+- **Form Handling**: Integrate `react-hook-form` and `zod` for strict, type-safe form validation across all inputs.
+- **SpacetimeDB Integration**: Ensure the root component subscribes to all relevant tables (`shops`, `chemical_inventory`, `sds_documents`, `spill_reports`, `compliance_deadlines`, `audit_logs`) so data updates instantly across devices.
 
-Define the following tables with appropriate types and indexes:
+## 2. Core Pages Implementation
 
-- **shops**: `id: Identity` (PK), `name: string`, `owner: Identity` (Unique Index).
-- **chemical_inventory**: `id: number` (Autoinc PK), `shop_id: Identity`, `cas_number: string`, `name: string`, `quantity: number`, `unit: string`, `location: string`, `last_updated: number` (Index: `shop_id`).
-- **sds_documents**: `id: number` (Autoinc PK), `shop_id: Identity`, `chemical_id: number`, `filename: string`, `s3_url: string`, `expiry_date: number` (Index: `shop_id`, `chemical_id`).
-- **spill_reports**: `id: number` (Autoinc PK), `shop_id: Identity`, `chemical_id: number`, `date: number`, `amount_spilled: number`, `description: string`, `actions_taken: string`, `witnesses: string` (Index: `shop_id`).
-- **compliance_deadlines**: `id: number` (Autoinc PK), `shop_id: Identity`, `type: string` (OSHA/EPA/etc.), `description: string`, `due_date: number`, `status: string` (Index: `shop_id`).
-- **audit_logs**: `id: number` (Autoinc PK), `shop_id: Identity`, `action: string`, `user: Identity`, `timestamp: number`, `details: string` (Index: `shop_id`).
+### 2.1 Dashboard (`/dashboard`)
+- **Purpose**: Real-time overview of the shop's status.
+- **Components**:
+    - Live inventory summary table.
+    - Quick metrics (total chemicals, recent spills, upcoming deadlines).
+    - Utilizes SpacetimeDB React hooks (`useChemicalInventoryTable`, etc.) for reactive updates.
 
-## 2. Multi-Tenancy and Row-Level Security
+### 2.2 Inventory (`/inventory`)
+- **Purpose**: Manage chemical stock.
+- **Components**:
+    - List view of all chemicals.
+    - "Add Item" floating action button (FAB) or prominent top button.
+    - Add/Edit Item Form (using `react-hook-form` + `zod`):
+        - Fields: CAS Number, Name, Quantity, Unit, Location.
+    - *Placeholder*: A UI button indicating "Scan Barcode" (action doesn't need native device integration yet, just the UI layout).
 
-- **Ownership**: The `shop_id` (or `owner` in the `shops` table) will store the `Identity` of the user who owns the shop.
-- **Enforcement**: 
-    - Read filters: The frontend will only subscribe to data where `shop_id == ctx.sender` (enforced via server-side subscription filters if applicable, or logic in reducers).
-    - Write validation: Every reducer will check if the record's `shop_id` matches the `ctx.sender`.
+### 2.3 SDS Management (`/sds`)
+- **Purpose**: Safety Data Sheet uploads and links.
+- **Components**:
+    - Drag-and-drop file upload zone.
+    - Form to link the file to a specific `chemical_id`.
+    - Connection to the `uploadSDS` reducer.
+    - *Note*: Mock the S3 presigned URL generation client-side or use a placeholder URL for the MVP, focusing on calling the reducer correctly.
 
-## 3. Reducers Implementation
+### 2.4 Spill Logs (`/spills`)
+- **Purpose**: Reporting safety incidents.
+- **Components**:
+    - List of recent spills.
+    - "Log Spill" Form (`react-hook-form` + `zod`):
+        - Fields: Chemical (dropdown), Amount Spilled, Description, Actions Taken, Witnesses.
 
-Implement the following logic:
+### 2.5 Compliance Deadlines (`/deadlines`)
+- **Purpose**: Tracking OSHA/EPA dates.
+- **Components**:
+    - Calendar or chronological list view.
+    - Highlighting/Color-coding for overdue or upcoming deadlines.
+    - "Add Deadline" Form.
 
-- **createShop(name: string)**: Creates a entry in `shops` for the current `ctx.sender`.
-- **addInventoryItem(...)**: Adds a chemical to the current shop.
-- **updateQuantity(chemical_id: number, new_quantity: number)**: Updates stock levels.
-- **uploadSDS(chemical_id: number, filename: string, s3_url: string, expiry_date: number)**: Links an SDS document. *Note: Presigned URL logic is typically client-side, the reducer stores the metadata.*
-- **logSpill(...)**: Records a safety incident.
-- **createDeadline(...)**: Schedules compliance tasks.
-- **generateSafetyAudit()**: A reducer (or query logic) that aggregates data from the last 30 days into a structured JSON for reporting.
+### 2.6 Audits (`/audits`)
+- **Purpose**: Generate compliance reports.
+- **Components**:
+    - "Generate Safety Audit" button (calls the `generateSafetyAudit` reducer).
+    - Display the generated JSON report.
+    - "Download Report" button (converts JSON to a downloadable file).
+
+## 3. UI/UX Details
+- Utilize `shadcn/ui` components (Cards, Inputs, Buttons, Forms, Tables).
+- Ensure padding, touch targets, and typography are optimized for mobile devices (min 44px touch targets).
 
 ## 4. Execution Steps
-
-1. [ ] **Research & Update Schema**: Implement table definitions and `audit_logs` helper.
-2. [ ] **Implement Reducers**: Write the logic for shop management and safety logs.
-3. [ ] **Binding Regeneration**: Run binding generation to update the React client.
-4. [ ] **Verification**: Run `npm run build` in `spacetimedb` and ensure the client compiles.
-5. [ ] **Commit**: Final commit with a schema diagram in the message.
-
-## Questions/Clarifications
-
-- **ID Generation**: Should we use `t.identity()` for `shop_id` and auto-increment for other IDs? (Assuming Yes).
-- **Audit Logs**: Should every action be logged automatically within the reducers? (Assuming Yes).
+1. [ ] Configure Dark Mode and core Layout (Bottom Nav).
+2. [ ] Set up SpacetimeDB global subscriptions.
+3. [ ] Build Dashboard and Inventory pages (with forms).
+4. [ ] Build SDS, Spills, and Deadlines pages.
+5. [ ] Build Audits page and download logic.
+6. [ ] Verify PWA responsiveness and real-time sync.
+7. [ ] Final Commit: `mobile-first UI complete`.

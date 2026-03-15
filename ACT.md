@@ -1,5 +1,4 @@
-# ACT: Implementation Log - Schema Expansion
+# ACT: Implementation Log - Mobile-First UI
 
-## [2026-03-15] 1. Database Schema Implementation
-- [2026-03-15 13:00] Initialized `ACT.md` for schema expansion.
-- [2026-03-15 13:01] Defining tables in `spacetimedb/src/index.ts`.
+## [2026-03-15] 1. UI Foundation & Theme Setup
+- [2026-03-15 14:00] Initialized `ACT.md` for Mobile-First UI task.

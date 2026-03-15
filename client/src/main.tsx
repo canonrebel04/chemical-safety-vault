@@ -10,12 +10,26 @@ const HOST = import.meta.env.VITE_SPACETIMEDB_HOST ?? 'ws://localhost:3000';
 const DB_NAME = import.meta.env.VITE_SPACETIMEDB_DB_NAME ?? 'react-ts';
 const TOKEN_KEY = `${HOST}/${DB_NAME}/auth_token`;
 
-const onConnect = (_conn: DbConnection, identity: Identity, token: string) => {
+const onConnect = (conn: DbConnection, identity: Identity, token: string) => {
   localStorage.setItem(TOKEN_KEY, token);
   console.log(
     'Connected to SpacetimeDB with identity:',
     identity.toHexString()
   );
+
+  // Subscribe to all relevant tables
+  conn.subscriptionBuilder()
+    .onApplied(() => {
+      console.log('Subscription applied');
+    })
+    .subscribe([
+      'SELECT * FROM shops',
+      'SELECT * FROM chemical_inventory',
+      'SELECT * FROM sds_documents',
+      'SELECT * FROM spill_reports',
+      'SELECT * FROM compliance_deadlines',
+      'SELECT * FROM audit_logs',
+    ]);
 };
 
 const onDisconnect = () => {

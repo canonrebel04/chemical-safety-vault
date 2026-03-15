@@ -1,29 +1,52 @@
-# TODO: Chemical Safety Vault Schema Expansion
+# TODO: Chemical Safety Vault Mobile-First UI
 
-- [x] **1. Database Schema Implementation** `[backend]` `[database]`
-  - [x] Define `shops` table with `id` (Identity PK), `name`, and `owner` (Unique Identity)
-  - [x] Define `chemical_inventory` table with auto-increment ID and `shop_id` index
-  - [x] Define `sds_documents` table with auto-increment ID and `shop_id`/`chemical_id` indexes
-  - [x] Define `spill_reports` table with auto-increment ID and `shop_id` index
-  - [x] Define `compliance_deadlines` table with auto-increment ID and `shop_id` index
-  - [x] Define `audit_logs` table with auto-increment ID and `shop_id` index
-- [x] **2. Core Reducer Logic** `[backend]`
-  - [x] Implement `createShop(name: string)` with owner validation
-  - [x] Implement `addInventoryItem(...)` with `shop_id` enforcement
-  - [x] Implement `updateQuantity(chemical_id, new_quantity)` with ownership check
-  - [x] Implement `uploadSDS(...)` to store document metadata
-  - [x] Implement `logSpill(...)` for safety incident reporting
-  - [x] Implement `createDeadline(...)` for compliance tracking
-- [x] **3. Advanced Logic & Reporting** `[backend]`
-  - [x] Implement `generateSafetyAudit()` to aggregate 30-day safety data into JSON
-  - [x] Create a helper function for automatic `audit_logs` entry generation
-- [x] **4. Multi-Tenancy Enforcement** `[backend]` `[security]`
-  - [x] Verify `ctx.sender` checks in all data-modifying reducers
-  - [x] Ensure `shop_id` is correctly propagated across all related tables
-- [x] **5. Client Integration** `[frontend]` `[parallel]`
-  - [x] Regenerate SpacetimeDB client bindings: `npm run spacetime:generate` in `client/`
-  - [x] Verify `client/src/module_bindings` contains the new types and reducers
-- [x] **6. Verification & Finalization** `[test]`
-  - [x] Run `npm run build` in `spacetimedb/` to verify schema compilation
-  - [x] Run `npm run build` in `client/` to verify type-safe integration
-  - [x] Commit changes to `feature/schema-expansion` with schema diagram in message
+- [x] **1. UI Foundation & Theme Setup** `[frontend]`
+  - [x] Set default theme to dark mode in `client/tailwind.config.js` and `client/src/index.css`.
+  - [x] Update `client/index.html` body background to match dark mode.
+  - [x] Create a Layout component (`client/src/components/Layout.tsx`) to wrap all pages.
+  - [x] Implement a mobile-first, fixed Bottom Navigation bar in the Layout using `lucide-react` icons.
+
+- [x] **2. Core Components & Shadcn Configuration** `[frontend]` `[parallel]`
+  - [x] Install missing shadcn/ui components: `npx shadcn@latest add card input form label table table badge dialog` (or similar needed components).
+  - [x] Ensure `react-hook-form` and `@hookform/resolvers/zod` are installed and ready.
+
+- [x] **3. SpacetimeDB Integration** `[frontend]`
+  - [x] Update `client/src/main.tsx` or create a centralized hook to subscribe to all relevant tables (`shops`, `chemical_inventory`, `sds_documents`, `spill_reports`, `compliance_deadlines`, `audit_logs`) on connect.
+
+- [x] **4. Dashboard View (`/dashboard`)** `[frontend]`
+  - [x] Create `client/src/pages/Dashboard.tsx`.
+  - [x] Implement live inventory summary using `useChemicalInventoryTable`.
+  - [x] Implement quick metrics cards (total items, active deadlines, recent spills).
+
+- [x] **5. Inventory View (`/inventory`)** `[frontend]`
+  - [x] Create `client/src/pages/Inventory.tsx`.
+  - [x] Build the list view of current chemicals.
+  - [x] Create an "Add Item" form modal/dialog using `zod` schema (CAS, Name, Qty, Unit, Location).
+  - [x] Connect the form to `addInventoryItem` reducer.
+  - [x] Add a visual "Scan Barcode" placeholder button.
+
+- [x] **6. SDS Management View (`/sds`)** `[frontend]`
+  - [x] Create `client/src/pages/SDS.tsx`.
+  - [x] Implement a drag-and-drop or standard file upload UI placeholder.
+  - [x] Create a form to link the uploaded file to a `chemical_id`.
+  - [x] Connect to `uploadSDS` reducer (mocking the S3 URL for now).
+
+- [x] **7. Spill Logs View (`/spills`)** `[frontend]`
+  - [x] Create `client/src/pages/Spills.tsx`.
+  - [x] Display a list of recorded spills using `useSpillReportsTable`.
+  - [x] Create "Log Spill" form (Chemical ID, Amount, Description, Actions, Witnesses) connected to `logSpill` reducer.
+
+- [x] **8. Compliance Deadlines View (`/deadlines`)** `[frontend]`
+  - [x] Create `client/src/pages/Deadlines.tsx`.
+  - [x] Display deadlines in a chronological list, highlighting overdue ones in red/warning colors.
+  - [x] Create "Add Deadline" form (Type, Description, Date) connected to `createDeadline` reducer.
+
+- [x] **9. Audits View (`/audits`)** `[frontend]`
+  - [x] Create `client/src/pages/Audits.tsx`.
+  - [x] Implement "Generate Safety Audit" button triggering the `generateSafetyAudit` reducer.
+  - [x] Implement logic to display or download the resulting JSON (since reducers don't return data directly to the caller, we might need to display audit logs or just trigger the action).
+
+- [x] **10. Finalization** `[frontend]`
+  - [x] Update routing in `client/src/App.tsx` to include the Layout and all new pages.
+  - [x] Run `npm run build` to ensure no TypeScript or Vite compilation errors.
+  - [x] Commit all changes with message: `mobile-first UI complete`.
