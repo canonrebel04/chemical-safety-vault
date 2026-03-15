@@ -1,46 +1,46 @@
-# TEST: Chemical Safety Vault MVP Launch Verification
+# TEST: Chemical Safety Vault v0.1 Improvements Verification
 
 ## Approved Test Plan
 
-1. **PWA & Offline Functionality**:
-    - [ ] Verify `InstallPrompt` component implementation.
-    - [ ] Verify `OfflineDrafts` utility logic.
-    - [ ] Verify `SyncDrafts` component and online/offline detection.
-    - [ ] Verify `Loader2` spinners and `sonner` toast usage.
-
-2. **Compliance Data Export**:
-    - [ ] Verify `export-utils.ts` CSV generation logic.
-    - [ ] Verify `Audits.tsx` data portability UI.
-
-3. **Documentation**:
-    - [ ] Verify `README.md` for local setup and deployment guides.
-    - [ ] Verify environment variable documentation.
-
-4. **Build & Deployment**:
+1. **Integrated Barcode Scanner**:
+    - [ ] Verify `html5-qrcode` dependency.
+    - [ ] Inspect `BarcodeScanner.tsx` implementation.
+    - [ ] Verify integration and auto-fill logic in `Inventory.tsx`.
+2. **OSHA Regulation Auto-Sync**:
+    - [ ] Verify "Sync OSHA" button and mock logic in `Deadlines.tsx`.
+3. **Professional Report Branding**:
+    - [ ] Inspect `pdf-generator.ts` for header, footer, and metadata.
+4. **SDS Expiry Proactive Alerts**:
+    - [ ] Verify `useDeadlineChecker.ts` scans `sds_documents` for upcoming expirations.
+    - [ ] Confirm expiry alerts trigger `logDeadlineReminder`.
+5. **Team Activity Feed**:
+    - [ ] Inspect `ActivityFeed.tsx` for proper fetching and formatting.
+    - [ ] Verify integration in `Dashboard.tsx`.
+6. **Documentation & Build Integrity**:
+    - [ ] Verify `README.md` contains one-line commands.
     - [ ] Run backend build.
     - [ ] Run frontend build.
-    - [ ] Confirm binding regeneration.
 
 ## Test Execution Log
 
-1. **PWA & Offline Functionality**:
-    - [x] Verify `InstallPrompt` component implementation. (PASSED)
-    - [x] Verify `OfflineDrafts` utility logic. (PASSED)
-    - [x] Verify `SyncDrafts` component and online/offline detection. (PASSED)
-    - [x] Verify `Loader2` spinners and `sonner` toast usage. (PASSED)
-
-2. **Compliance Data Export**:
-    - [x] Verify `export-utils.ts` CSV generation logic. (PASSED)
-    - [x] Verify `Audits.tsx` data portability UI. (PASSED)
-
-3. **Documentation**:
-    - [x] Verify `README.md` for local setup and deployment guides. (PASSED)
-    - [x] Verify environment variable documentation. (PASSED)
-
-4. **Build & Deployment**:
+1. **Integrated Barcode Scanner**:
+    - [x] Verify `html5-qrcode` dependency. (PASSED)
+    - [x] Inspect `BarcodeScanner.tsx` implementation. (PASSED)
+    - [x] Verify integration and auto-fill logic in `Inventory.tsx`. (PASSED)
+2. **OSHA Regulation Auto-Sync**:
+    - [x] Verify "Sync OSHA" button and mock logic in `Deadlines.tsx`. (PASSED)
+3. **Professional Report Branding**:
+    - [x] Inspect `pdf-generator.ts` for header, footer, and metadata. (PASSED)
+4. **SDS Expiry Proactive Alerts**:
+    - [x] Verify `useDeadlineChecker.ts` scans `sds_documents` for upcoming expirations. (PASSED)
+    - [x] Confirm expiry alerts trigger `logDeadlineReminder`. (PASSED)
+5. **Team Activity Feed**:
+    - [x] Inspect `ActivityFeed.tsx` for proper fetching and formatting. (PASSED)
+    - [x] Verify integration in `Dashboard.tsx`. (PASSED)
+6. **Documentation & Build Integrity**:
+    - [x] Verify `README.md` contains one-line commands. (PASSED)
     - [x] Run backend build. (PASSED)
     - [x] Run frontend build. (PASSED)
-    - [x] Confirm binding regeneration. (PASSED)
 
 ## Summary
-All tests passed. The Chemical Safety Vault MVP is fully implemented, verified for offline usage, and ready for deployment. The application features a robust PWA experience, comprehensive data export capabilities, and clear documentation for launch.
+All tests passed. The v0.1 improvements have been successfully implemented and verified. The application now includes a functional barcode scanner, OSHA regulation auto-sync, professional PDF branding, proactive SDS expiry alerts, and a real-time team activity feed. The codebase is stable and builds successfully for production.
