@@ -1,46 +1,48 @@
-# TEST: Chemical Safety Vault Mobile-First UI Verification
+# TEST: Chemical Safety Vault Auth & Multi-Tenancy Verification
 
 ## Approved Test Plan
 
-1. **UI Foundation & Theme**:
-    - [ ] Verify `client/index.html` enables dark mode.
-    - [ ] Verify `client/src/components/Layout.tsx` bottom navigation.
-    - [ ] Verify routes in `client/src/App.tsx`.
+1. **Backend Logic Verification**:
+    - [ ] Inspect `spacetimedb/src/index.ts` for `users` and `invites` tables.
+    - [ ] Verify `initUser` logic for automatic shop/user creation.
+    - [ ] Verify `getShopId` helper usage in all reducers.
+    - [ ] Verify `inviteUser` and `acceptInvite` logic.
 
-2. **SpacetimeDB Integration**:
+2. **Frontend Auth & Route Protection Verification**:
+    - [ ] Verify `client/src/contexts/AuthContext.tsx` state management.
+    - [ ] Verify `client/src/components/ProtectedRoute.tsx` redirection logic.
+    - [ ] Verify `client/src/pages/Login.tsx` initialization flow.
+    - [ ] Verify Logout functionality.
+
+3. **Data Isolation & Multi-Tenancy Verification**:
+    - [ ] Verify table filtering in all page components.
     - [ ] Confirm subscriptions in `client/src/main.tsx`.
 
-3. **Page Logic & Data Binding**:
-    - [ ] Dashboard metrics and inventory hooks.
-    - [ ] Inventory Add Item form binding.
-    - [ ] SDS upload and link logic.
-    - [ ] Spills reporting form.
-    - [ ] Deadlines management.
-    - [ ] Audits generation trigger.
-
-4. **Build Integrity**:
-    - [ ] Run production build (`npm run build`).
+4. **Build Integrity Verification**:
+    - [ ] Run `npm run build` in `spacetimedb/`.
+    - [ ] Run `npm run build` in `client/`.
 
 ## Test Execution Log
 
-1. **UI Foundation & Theme**:
-    - [x] Verify `client/index.html` enables dark mode. (PASSED)
-    - [x] Verify `client/src/components/Layout.tsx` bottom navigation. (PASSED)
-    - [x] Verify routes in `client/src/App.tsx`. (PASSED)
+1. **Backend Logic Verification**:
+    - [x] Inspect `spacetimedb/src/index.ts` for `users` and `invites` tables. (PASSED)
+    - [x] Verify `initUser` logic for automatic shop/user creation. (PASSED)
+    - [x] Verify `getShopId` helper usage in all reducers. (PASSED)
+    - [x] Verify `inviteUser` and `acceptInvite` logic. (PASSED)
 
-2. **SpacetimeDB Integration**:
+2. **Frontend Auth & Route Protection Verification**:
+    - [x] Verify `client/src/contexts/AuthContext.tsx` state management. (PASSED)
+    - [x] Verify `client/src/components/ProtectedRoute.tsx` redirection logic. (PASSED)
+    - [x] Verify `client/src/pages/Login.tsx` initialization flow. (PASSED)
+    - [x] Verify Logout functionality. (PASSED)
+
+3. **Data Isolation & Multi-Tenancy Verification**:
+    - [x] Verify table filtering in all page components. (PASSED)
     - [x] Confirm subscriptions in `client/src/main.tsx`. (PASSED)
 
-3. **Page Logic & Data Binding**:
-    - [x] Dashboard metrics and inventory hooks. (PASSED)
-    - [x] Inventory Add Item form binding. (PASSED)
-    - [x] SDS upload and link logic. (PASSED)
-    - [x] Spills reporting form. (PASSED)
-    - [x] Deadlines management. (PASSED)
-    - [x] Audits generation trigger. (PASSED)
-
-4. **Build Integrity**:
-    - [x] Run production build (`npm run build`). (PASSED)
+4. **Build Integrity Verification**:
+    - [x] Run `npm run build` in `spacetimedb/`. (PASSED)
+    - [x] Run `npm run build` in `client/`. (PASSED)
 
 ## Summary
-All tests passed. The mobile-first PWA UI is fully implemented, correctly integrated with SpacetimeDB real-time features, and passes all build checks.
+All tests passed. The authentication and multi-tenancy system is fully implemented and verified. Data isolation is enforced at both the backend (reducer level) and frontend (component filtering and subscriptions).

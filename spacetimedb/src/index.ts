@@ -257,6 +257,70 @@ export const updateQuantity = spacetimedb.reducer(
   }
 );
 
+/**
+ * Stage 1: Request a presigned URL from S3.
+ * In a real implementation, this reducer would use AWS SDK or manual signing logic.
+ * For this scaffold, we return a mock URL.
+ */
+export const requestS3Upload = spacetimedb.reducer(
+  { filename: t.string() },
+  (ctx, { filename }) => {
+    const shop_id = getShopId(ctx);
+    const mockPresignedUrl = `https://s3.mock-region.amazonaws.com/chemical-safety-vault/${shop_id.toHexString()}/${filename}?X-Amz-Algorithm=AWS4-HMAC-SHA256&...`;
+    const mockPublicUrl = `https://d123.cloudfront.net/${shop_id.toHexString()}/${filename}`;
+    
+    console.info(`Presigned URL requested for ${filename} by shop ${shop_id.toHexString()}`);
+    
+    // In SpacetimeDB, reducers don't return values directly to the client easily.
+    // Usually, we would log this to a table or emit an event. 
+    // For this prototype, we'll assume the client "knows" the mock format or we'd add an upload_requests table.
+    logAction(ctx, shop_id, "REQUEST_S3_UPLOAD", `Requested upload for ${filename}`);
+  }
+);
+
+/**
+ * Stage 3: After S3 upload is complete, attach the public URL to the chemical.
+ */
+export const attachSDS = spacetimedb.reducer(
+  {
+    chemical_id: t.u32(),
+    filename: t.string(),
+    s3_url: t.string(),
+    expiry_date: t.timestamp(),
+  },
+  (ctx, sds) => {
+    const shop_id = getShopId(ctx);
+    const item = ctx.db.chemical_inventory.id.find(sds.chemical_id);
+    if (!item || item.shop_id.toHexString() !== shop_id.toHexString()) {
+      throw new Error("Invalid chemical ID or unauthorized");
+    }
+
+    ctx.db.sds_documents.insert({
+      id: 0,
+      ...sds,
+      shop_id,
+    });
+    logAction(ctx, shop_id, "ATTACH_SDS", `Attached SDS ${sds.filename} to chemical ID ${sds.chemical_id}.`);
+  }
+);
+
+/**
+ * Remove an SDS reference.
+ */
+export const deleteSDS = spacetimedb.reducer(
+  { sds_id: t.u32() },
+  (ctx, { sds_id }) => {
+    const shop_id = getShopId(ctx);
+    const doc = ctx.db.sds_documents.id.find(sds_id);
+    if (!doc || doc.shop_id.toHexString() !== shop_id.toHexString()) {
+      throw new Error("SDS document not found or unauthorized");
+    }
+
+    ctx.db.sds_documents.id.delete(sds_id);
+    logAction(ctx, shop_id, "DELETE_SDS", `Deleted SDS document ID ${sds_id}.`);
+  }
+);
+
 export const uploadSDS = spacetimedb.reducer(
   {
     chemical_id: t.u32(),

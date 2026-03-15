@@ -24,6 +24,8 @@ const onConnect = (conn: DbConnection, identity: Identity, token: string) => {
     })
     .subscribe([
       'SELECT * FROM shops',
+      'SELECT * FROM users',
+      'SELECT * FROM invites',
       'SELECT * FROM chemical_inventory',
       'SELECT * FROM sds_documents',
       'SELECT * FROM spill_reports',

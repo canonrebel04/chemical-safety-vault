@@ -1,59 +1,55 @@
-# Plan: Auth + Multi-Tenancy Locked
+# Plan: SDS Upload Working
 
-This plan outlines the implementation of a robust authentication and multi-tenancy system for the Chemical Safety Vault using SpacetimeDB.
+This plan outlines the implementation of a secure S3-based upload flow for Safety Data Sheets (SDS) in the Chemical Safety Vault.
 
-## 1. Backend: Identity and Multi-Tenancy (`spacetimedb/src/index.ts`)
+## 1. Backend: S3 Integration Logic (`spacetimedb/src/index.ts`)
 
-- **User & Shop Association**: 
-    - Keep the existing `shops` table.
-    - Add a `users` table: `id: Identity` (PK), `shop_id: Identity`, `email: string`, `role: string`.
-- **Automatic Shop Creation**: 
-    - Implement a `login` or `initUser` reducer.
-    - If `ctx.sender` does not exist in `users`, create a new `shops` record (where `owner = ctx.sender`) and a `users` record pointing to that shop.
-- **Invite Flow**:
-    - Implement an `inviteUser(email: string)` reducer: creates a pending invite.
-    - Implement an `acceptInvite(shop_id: Identity)` reducer: updates the user's `shop_id` to the invited shop.
-- **Strict Enforcement**:
-    - Every data-modifying reducer must look up the user's `shop_id` from the `users` table and use it for the operation.
-    - Validate that the user belongs to the shop they are trying to modify.
+- **Configuration**: 
+    - Store S3 bucket name and region as module constants (or environment variables if supported).
+    - Note: AWS SDK typically requires secrets. In a real SpacetimeDB environment, secrets would be managed via the CLI/Dashboard. For this scaffold, we will use placeholders.
+- **Reducers**:
+    - `requestS3Upload(filename: string)`:
+        - Uses AWS SDK (or a fetch-based manual signing logic) to generate a **PutObject** presigned URL.
+        - Returns the presigned URL and the final intended public URL.
+    - `attachSDS(chemical_id: u32, filename: string, s3_url: string, expiry_date: timestamp)`:
+        - Stores the permanent public URL in the `sds_documents` table.
+        - Enforces `shop_id` ownership via `getShopId(ctx)`.
+    - `deleteSDS(sds_id: u32)`:
+        - Removes the record from the `sds_documents` table.
+        - Note: In this MVP, we won't trigger physical S3 deletion from the reducer (usually handled by a separate process or lifecycle policy), but we will remove the reference.
 
-## 2. Frontend: Authentication & Protected Routes (`client/`)
+## 2. Frontend: Multi-Step Upload Flow (`client/src/pages/SDS.tsx`)
 
-- **Auth State Management**:
-    - Utilize SpacetimeDB's built-in identity management.
-    - Create an `AuthContext` or use `useSpacetimeDB` to track if the user is "logged in" (identity exists and user record is initialized).
-- **Login/Register Page**:
-    - A simple view to initiate the connection. Since SpacetimeDB handles the identity, this might just be a "Get Started" button that triggers the initial reducer.
-- **Route Protection**:
-    - Implement a `ProtectedRoute` component that redirects to `/` or `/login` if no identity is present.
-    - Protect `/dashboard`, `/inventory`, `/sds`, `/spills`, `/deadlines`, `/audits`.
-- **Multi-Tenant Subscriptions**:
-    - Update subscriptions in `main.tsx` to use server-side filtering (if supported by the SDK version) or ensure the frontend logic only displays data matching the user's `shop_id`.
-- **Logout**:
-    - Clear the auth token from `localStorage` and reset the SpacetimeDB connection.
+- **Dependencies**: 
+    - Install `axios` or use `fetch` for the S3 PUT request.
+- **Flow**:
+    1. User selects a PDF file.
+    2. Frontend calls `reducers.requestS3Upload(file.name)`.
+    3. Frontend receives the presigned URL.
+    4. Frontend performs a `PUT` request to the presigned URL with the file data.
+    5. On success, frontend calls `reducers.attachSDS(...)` with the public URL and metadata.
+- **UI Updates**:
+    - Progress bar/indicator during the upload phase.
+    - Success/Error notifications using shadcn/ui Toast or Alert.
+    - Add a "Delete" button next to existing documents.
 
-## 3. Invite UI
+## 3. Storage Strategy
 
-- Add a "Team" or "Settings" section in `/dashboard` or a new page.
-- Display the current `shop_id` (as a shareable code/link).
-- Form to "Join Shop" by entering a `shop_id`.
+- **Bucket Policy**: Ensure the S3 bucket allows `PUT` from the application origin (CORS) and `GET` for the public URLs (or CloudFront).
+- **Public URLs**: The `sds_documents` table stores only the final public URL (or CloudFront URL).
 
 ## 4. Testing & Verification
 
-- **Isolation Test**: 
-    - Create User A -> Add chemical "Acetone".
-    - Create User B -> Verify User B cannot see "Acetone".
-- **Invite Test**:
-    - User A invites User B.
-    - User B joins Shop A.
-    - Verify User B can now see "Acetone".
+- **Presigned Verification**: Verify the generated URL is valid and contains the correct signing headers.
+- **Upload Test**: Perform a manual upload and verify the PDF is accessible via the returned public URL.
+- **Multi-Tenancy**: Verify that SDS documents are only visible/deletable by the shop that uploaded them.
 
 ## 5. Execution Steps
 
-1. [ ] **Backend**: Update schema with `users` and `invites` tables.
-2. [ ] **Backend**: Implement `initUser`, `inviteUser`, and `acceptInvite` reducers.
-3. [ ] **Backend**: Refactor existing reducers to pull `shop_id` from the `users` table.
-4. [ ] **Frontend**: Implement `AuthContext` and `ProtectedRoute`.
-5. [ ] **Frontend**: Build Login and Team management UI.
-6. [ ] **Verification**: Run multi-user isolation tests.
-7. [ ] **Commit**: `auth + multi-tenancy locked`.
+1. [ ] **Backend**: Install AWS SDK (if available in Spacetime JS environment) or implement signing helper.
+2. [ ] **Backend**: Implement `requestS3Upload` and `attachSDS`.
+3. [ ] **Backend**: Implement `deleteSDS`.
+4. [ ] **Frontend**: Implement `SDS.tsx` logic to handle the two-stage upload (Request -> Upload -> Attach).
+5. [ ] **Frontend**: Add delete functionality to the UI.
+6. [ ] **Verification**: Test the end-to-end flow.
+7. [ ] **Commit**: `SDS upload working`.

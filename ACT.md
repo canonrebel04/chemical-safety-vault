@@ -1,5 +1,5 @@
-# ACT: Implementation Log - Auth & Multi-Tenancy
+# ACT: Implementation Log - SDS S3 Upload
 
-## [2026-03-15] 1. Backend Schema & Logic Updates
-- [2026-03-15 15:30] Initialized `ACT.md`.
-- [2026-03-15 15:31] Reading `spacetimedb/src/index.ts`.
+## [2026-03-15] 1. Backend S3 Integration
+- [2026-03-15 16:00] Initialized `ACT.md` for SDS upload task.
+- [2026-03-15 16:01] Reading `spacetimedb/src/index.ts` to implement S3 reducers.

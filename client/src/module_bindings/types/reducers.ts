@@ -8,23 +8,29 @@ import { type Infer as __Infer } from "spacetimedb";
 // Import all reducer arg schemas
 import AcceptInviteReducer from "../accept_invite_reducer";
 import AddInventoryItemReducer from "../add_inventory_item_reducer";
+import AttachSdsReducer from "../attach_sds_reducer";
 import CreateDeadlineReducer from "../create_deadline_reducer";
 import CreateShopReducer from "../create_shop_reducer";
+import DeleteSdsReducer from "../delete_sds_reducer";
 import GenerateSafetyAuditReducer from "../generate_safety_audit_reducer";
 import InitUserReducer from "../init_user_reducer";
 import InviteUserReducer from "../invite_user_reducer";
 import LogSpillReducer from "../log_spill_reducer";
+import RequestS3UploadReducer from "../request_s_3_upload_reducer";
 import UpdateQuantityReducer from "../update_quantity_reducer";
 import UploadSdsReducer from "../upload_sds_reducer";
 
 export type AcceptInviteParams = __Infer<typeof AcceptInviteReducer>;
 export type AddInventoryItemParams = __Infer<typeof AddInventoryItemReducer>;
+export type AttachSdsParams = __Infer<typeof AttachSdsReducer>;
 export type CreateDeadlineParams = __Infer<typeof CreateDeadlineReducer>;
 export type CreateShopParams = __Infer<typeof CreateShopReducer>;
+export type DeleteSdsParams = __Infer<typeof DeleteSdsReducer>;
 export type GenerateSafetyAuditParams = __Infer<typeof GenerateSafetyAuditReducer>;
 export type InitUserParams = __Infer<typeof InitUserReducer>;
 export type InviteUserParams = __Infer<typeof InviteUserReducer>;
 export type LogSpillParams = __Infer<typeof LogSpillReducer>;
+export type RequestS3UploadParams = __Infer<typeof RequestS3UploadReducer>;
 export type UpdateQuantityParams = __Infer<typeof UpdateQuantityReducer>;
 export type UploadSdsParams = __Infer<typeof UploadSdsReducer>;
 

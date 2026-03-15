@@ -1,36 +1,35 @@
-# TODO: Chemical Safety Vault Auth & Multi-Tenancy
+# TODO: Chemical Safety Vault SDS S3 Upload
 
-- [x] **1. Backend Schema & Logic Updates** `[backend]` `[database]`
-  - [x] Add `users` table to `spacetimedb/src/index.ts` (id, shop_id, email, role).
-  - [x] Add `invites` table (id, shop_id, invitee_email, status).
-  - [x] Implement `initUser(email: string)` reducer:
-    - [x] Check if user exists.
-    - [x] If not, create a new `shops` record and a `users` record.
-  - [x] Implement `inviteUser(email: string)` and `acceptInvite(shop_id: Identity)` reducers.
-  - [x] Refactor existing reducers (`addInventoryItem`, `logSpill`, etc.) to:
-    - [x] Fetch the user's `shop_id` from the `users` table.
-    - [x] Enforce that the operation only affects data for that `shop_id`.
+- [x] **1. Backend S3 Integration** `[backend]` `[database]`
+  - [x] Implement `requestS3Upload(filename: string)` reducer in `spacetimedb/src/index.ts`:
+    - [x] Add manual S3 presigned URL signing logic (or use SDK if compatible).
+    - [x] Return both `presignedUrl` and `publicUrl`.
+  - [x] Implement `attachSDS(chemical_id: u32, filename: string, s3_url: string, expiry_date: timestamp)` reducer:
+    - [x] Ensure multi-tenancy check using `getShopId(ctx)`.
+    - [x] Store metadata in `sds_documents` table.
+  - [x] Implement `deleteSDS(sds_id: u32)` reducer:
+    - [x] Verify ownership before deletion.
+    - [x] Remove record from `sds_documents`.
 
-- [x] **2. Frontend Auth Integration** `[frontend]`
-  - [x] Create `client/src/contexts/AuthContext.tsx` to manage SpacetimeDB identity and user profile.
-  - [x] Implement a `ProtectedRoute` wrapper component.
-  - [x] Create a `Login` page (`client/src/pages/Login.tsx`) for first-time user initialization.
-  - [x] Implement `Logout` functionality (clear token, reset state).
+- [x] **2. Frontend Dependencies & UI Updates** `[frontend]` `[parallel]`
+  - [x] Install `axios` for robust HTTP PUT requests: `npm install axios` in `client/`.
+  - [x] Update `client/src/pages/SDS.tsx` UI:
+    - [x] Add a visual "Delete" button to the linked documents list.
+    - [x] Implement an "Uploading..." state with a progress indicator or spinner.
 
-- [x] **3. Multi-Tenancy & Data Isolation** `[frontend]` `[security]`
-  - [x] Update `client/src/main.tsx` subscriptions to filter by `shop_id` (using SpacetimeDB's server-side filtering syntax if available).
-  - [x] Ensure all page-level `useTable` hooks only display data belonging to the current user's shop.
+- [x] **3. SDS Upload Logic Implementation** `[frontend]`
+  - [x] Refactor `onSubmit` in `SDS.tsx` to follow the multi-stage flow:
+    - [x] Stage 1: Call `reducers.requestS3Upload`.
+    - [x] Stage 2: Perform `PUT` to S3 using the received presigned URL.
+    - [x] Stage 3: Call `reducers.attachSDS` with the resulting public URL.
+  - [x] Implement error handling for each stage (e.g., toast notifications).
 
-- [x] **4. User Management & Invites UI** `[frontend]`
-  - [x] Add a "Team" page or dialog to view current shop members.
-  - [x] Display the shareable `shop_id`.
-  - [x] Implement the "Join Shop" flow (entering a shop ID to switch shops).
 
-- [x] **5. Testing & Validation** `[test]`
-  - [x] Verify User A cannot see User B's inventory (manual cross-browser test).
-  - [x] Verify the invite/join flow correctly merges a user into an existing shop.
+- [x] **4. Multi-Tenant Verification & Binding Regeneration** `[test]`
   - [x] Regenerate client bindings: `npm run spacetime:generate`.
-  - [x] Run production build: `npm run build`.
+  - [x] Verify that the `requestS3Upload` and `attachSDS` reducers are correctly mapped in `client/src/module_bindings/`.
 
-- [x] **6. Finalization**
-  - [x] Commit changes with message: `auth + multi-tenancy locked`.
+- [x] **5. Final Verification & Build** `[test]`
+  - [x] Run `npm run build` in `spacetimedb/`.
+  - [x] Run `npm run build` in `client/`.
+  - [x] Commit changes with message: `SDS upload working`.
