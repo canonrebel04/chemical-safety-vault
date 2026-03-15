@@ -3,11 +3,22 @@
 
 /* eslint-disable */
 /* tslint:disable */
-import { type Infer as __Infer } from 'spacetimedb';
+import { type Infer as __Infer } from "spacetimedb";
 
 // Import all reducer arg schemas
-import AddReducer from '../add_reducer';
-import SayHelloReducer from '../say_hello_reducer';
+import AddInventoryItemReducer from "../add_inventory_item_reducer";
+import CreateDeadlineReducer from "../create_deadline_reducer";
+import CreateShopReducer from "../create_shop_reducer";
+import GenerateSafetyAuditReducer from "../generate_safety_audit_reducer";
+import LogSpillReducer from "../log_spill_reducer";
+import UpdateQuantityReducer from "../update_quantity_reducer";
+import UploadSdsReducer from "../upload_sds_reducer";
 
-export type AddParams = __Infer<typeof AddReducer>;
-export type SayHelloParams = __Infer<typeof SayHelloReducer>;
+export type AddInventoryItemParams = __Infer<typeof AddInventoryItemReducer>;
+export type CreateDeadlineParams = __Infer<typeof CreateDeadlineReducer>;
+export type CreateShopParams = __Infer<typeof CreateShopReducer>;
+export type GenerateSafetyAuditParams = __Infer<typeof GenerateSafetyAuditReducer>;
+export type LogSpillParams = __Infer<typeof LogSpillReducer>;
+export type UpdateQuantityParams = __Infer<typeof UpdateQuantityReducer>;
+export type UploadSdsParams = __Infer<typeof UploadSdsReducer>;
+

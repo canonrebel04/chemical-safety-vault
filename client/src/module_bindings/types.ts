@@ -8,9 +8,66 @@ import {
   t as __t,
   type AlgebraicTypeType as __AlgebraicTypeType,
   type Infer as __Infer,
-} from 'spacetimedb';
+} from "spacetimedb";
 
-export const Person = __t.object('Person', {
-  name: __t.string(),
+export const AuditLogs = __t.object("AuditLogs", {
+  id: __t.u32(),
+  shopId: __t.identity(),
+  action: __t.string(),
+  user: __t.identity(),
+  timestamp: __t.timestamp(),
+  details: __t.string(),
 });
-export type Person = __Infer<typeof Person>;
+export type AuditLogs = __Infer<typeof AuditLogs>;
+
+export const ChemicalInventory = __t.object("ChemicalInventory", {
+  id: __t.u32(),
+  shopId: __t.identity(),
+  casNumber: __t.string(),
+  name: __t.string(),
+  quantity: __t.f32(),
+  unit: __t.string(),
+  location: __t.string(),
+  lastUpdated: __t.timestamp(),
+});
+export type ChemicalInventory = __Infer<typeof ChemicalInventory>;
+
+export const ComplianceDeadlines = __t.object("ComplianceDeadlines", {
+  id: __t.u32(),
+  shopId: __t.identity(),
+  type: __t.string(),
+  description: __t.string(),
+  dueDate: __t.timestamp(),
+  status: __t.string(),
+});
+export type ComplianceDeadlines = __Infer<typeof ComplianceDeadlines>;
+
+export const SdsDocuments = __t.object("SdsDocuments", {
+  id: __t.u32(),
+  shopId: __t.identity(),
+  chemicalId: __t.u32(),
+  filename: __t.string(),
+  s3Url: __t.string(),
+  expiryDate: __t.timestamp(),
+});
+export type SdsDocuments = __Infer<typeof SdsDocuments>;
+
+export const Shops = __t.object("Shops", {
+  id: __t.identity(),
+  name: __t.string(),
+  owner: __t.identity(),
+});
+export type Shops = __Infer<typeof Shops>;
+
+export const SpillReports = __t.object("SpillReports", {
+  id: __t.u32(),
+  shopId: __t.identity(),
+  chemicalId: __t.u32(),
+  date: __t.timestamp(),
+  amountSpilled: __t.f32(),
+  description: __t.string(),
+  actionsTaken: __t.string(),
+  witnesses: __t.string(),
+});
+export type SpillReports = __Infer<typeof SpillReports>;
+

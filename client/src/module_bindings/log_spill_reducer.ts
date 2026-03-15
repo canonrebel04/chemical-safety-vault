@@ -8,8 +8,12 @@ import {
   t as __t,
   type AlgebraicTypeType as __AlgebraicTypeType,
   type Infer as __Infer,
-} from 'spacetimedb';
+} from "spacetimedb";
 
-export default __t.row({
-  name: __t.string(),
-});
+export default {
+  chemicalId: __t.u32(),
+  amountSpilled: __t.f32(),
+  description: __t.string(),
+  actionsTaken: __t.string(),
+  witnesses: __t.string(),
+};

@@ -1,19 +1,29 @@
-# TODO: Chemical Safety Vault Initial Scaffold
+# TODO: Chemical Safety Vault Schema Expansion
 
-- [x] 1. Initialize project with SpacetimeDB CLI
-    - [x] Run `spacetime dev --template react-ts`
-- [x] 2. Restructure folder hierarchy
-    - [x] Rename module directory to `spacetimedb/`
-    - [x] Rename client directory to `client/`
-- [x] 3. PWA Setup
-    - [x] Add `client/public/manifest.json`
-    - [x] Add `client/src/sw.ts` (service-worker.js)
-    - [x] Register service worker in `client/src/main.tsx`
-- [x] 4. Dependencies & UI Setup
-    - [x] Install `tailwind`, `shadcn/ui`, `lucide-react`, `date-fns`, `zustand`, `react-hook-form`, `zod`
-    - [x] Configure Tailwind in `client/`
-- [x] 5. Landing Page & Routing
-    - [x] Add basic landing page with "Chemical Safety Log Vault" text
-    - [x] Add "Launch App" button to `/dashboard`
-- [x] 6. Initial Commit
-    - [x] Stage and commit with message "initial spacetime scaffold + PWA"
+- [x] **1. Database Schema Implementation** `[backend]` `[database]`
+  - [x] Define `shops` table with `id` (Identity PK), `name`, and `owner` (Unique Identity)
+  - [x] Define `chemical_inventory` table with auto-increment ID and `shop_id` index
+  - [x] Define `sds_documents` table with auto-increment ID and `shop_id`/`chemical_id` indexes
+  - [x] Define `spill_reports` table with auto-increment ID and `shop_id` index
+  - [x] Define `compliance_deadlines` table with auto-increment ID and `shop_id` index
+  - [x] Define `audit_logs` table with auto-increment ID and `shop_id` index
+- [x] **2. Core Reducer Logic** `[backend]`
+  - [x] Implement `createShop(name: string)` with owner validation
+  - [x] Implement `addInventoryItem(...)` with `shop_id` enforcement
+  - [x] Implement `updateQuantity(chemical_id, new_quantity)` with ownership check
+  - [x] Implement `uploadSDS(...)` to store document metadata
+  - [x] Implement `logSpill(...)` for safety incident reporting
+  - [x] Implement `createDeadline(...)` for compliance tracking
+- [x] **3. Advanced Logic & Reporting** `[backend]`
+  - [x] Implement `generateSafetyAudit()` to aggregate 30-day safety data into JSON
+  - [x] Create a helper function for automatic `audit_logs` entry generation
+- [x] **4. Multi-Tenancy Enforcement** `[backend]` `[security]`
+  - [x] Verify `ctx.sender` checks in all data-modifying reducers
+  - [x] Ensure `shop_id` is correctly propagated across all related tables
+- [x] **5. Client Integration** `[frontend]` `[parallel]`
+  - [x] Regenerate SpacetimeDB client bindings: `npm run spacetime:generate` in `client/`
+  - [x] Verify `client/src/module_bindings` contains the new types and reducers
+- [x] **6. Verification & Finalization** `[test]`
+  - [x] Run `npm run build` in `spacetimedb/` to verify schema compilation
+  - [x] Run `npm run build` in `client/` to verify type-safe integration
+  - [x] Commit changes to `feature/schema-expansion` with schema diagram in message
