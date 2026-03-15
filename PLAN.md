@@ -1,47 +1,50 @@
-# Plan: Audit Generation Complete
+# Plan: Stripe Billing Wired
 
-This plan outlines the enhancement of the safety audit system to provide professional, OSHA-compliant PDF reports generated from real-time shop data.
+This plan outlines the integration of Stripe payments into the Chemical Safety Vault to support a $59/mo premium plan with unlimited features.
 
-## 1. Backend: Enhanced Audit Reducer (`spacetimedb/src/index.ts`)
+## 1. Backend: Subscription Schema & Logic (`spacetimedb/src/index.ts`)
 
-- **Logic Refinement**: 
-    - Update `generateSafetyAudit` to return (via console/log or a temporary audit table if needed) a comprehensive shop state.
-    - Fields to include: 
-        - Shop Info (Name, Owner).
-        - Full Chemical Inventory (Name, CAS, Qty, Unit, Location).
-        - Spill Incidents (Last 30-90 days).
-        - Compliance Deadlines (Upcoming and Overdue).
-- **Audit Persistence**:
-    - Every time a report is generated, store a full JSON snapshot of the audit in the `audit_logs` table with action type `FULL_SAFETY_AUDIT`.
+- **Schema Update**: 
+    - Modify the `shops` table to include:
+        - `plan: string` (default: "free")
+        - `stripe_subscription_id: string?` (optional)
+- **Reducer**:
+    - `createSubscription(subscription_id: string)`:
+        - Associates the provided `subscription_id` with the user's shop.
+        - Updates the `plan` field to "premium".
+        - Enforces multi-tenancy via `getShopId(ctx)`.
+        - Logs the upgrade event in `audit_logs`.
 
-## 2. Frontend: PDF Generation & Export (`client/src/pages/Audits.tsx`)
+## 2. Frontend: Stripe Integration & Billing Page (`client/`)
 
 - **Dependencies**: 
-    - Install `jspdf` and `jspdf-autotable` for professional document formatting.
-- **Components**:
-    - **Export Logic**: A utility function `generateOSHAReport(data)` that takes the JSON audit data and maps it to a PDF layout.
-    - **Report Header**: Includes "Chemical Safety Log Vault", Shop Name, and Date generated.
-    - **Tables**: Cleanly formatted tables for Inventory, Spills, and Compliance.
-- **UI Integration**:
-    - Update the `/audits` page with a prominent "Export for OSHA" button.
-    - Show a loading spinner during PDF generation.
+    - Install `@stripe/stripe-js`.
+- **Billing Page (`client/src/pages/Billing.tsx`)**:
+    - Display current plan status.
+    - Show "Upgrade to Premium" button ($59/mo).
+    - Features: Unlimited Inventory, Custom SDS Storage, Priority Compliance Alerts.
+- **Stripe Checkout Flow**:
+    - **Trigger**: Clicking "Upgrade" redirects the user to a Stripe Checkout Session.
+    - **Return**: After successful payment, Stripe redirects back to a success URL (e.g., `/billing?success=true`).
+    - **Logic**: If `success=true` is detected in the URL, the frontend calls the `createSubscription` reducer with the mock or real subscription ID.
 
-## 3. Storage & Compliance
+## 3. Stripe Configuration (Test Mode)
 
-- **Immutable Logs**: Ensure the `audit_logs` entry cannot be modified, serving as a historical record of what was exported.
-- **Local Download**: The PDF is generated client-side and downloaded directly, minimizing server load.
+- Use a Stripe Publishable Key (Test Mode) in `.env.local`.
+- Use a predefined Price ID from the Stripe Dashboard for the $59/mo plan.
+- *Note*: In a production SpacetimeDB environment, webhook handlers would be used for robust lifecycle management (cancellations, failed payments). For this scaffold, we focus on the successful checkout wire-up.
 
 ## 4. Testing & Verification
 
-- **Data Integrity**: Verify that the JSON snapshot in `audit_logs` matches the data presented in the downloaded PDF.
-- **Layout Test**: Open the generated PDF and ensure all tables are readable and correctly titled.
-- **Multi-Tenancy**: Verify that User A cannot generate an audit for Shop B.
+- **Mock Payment**: Use Stripe test card numbers (e.g., 4242 4242...).
+- **Upgrade Verification**: Confirm that the `shops` record in SpacetimeDB updates the `plan` to "premium" and stores the subscription ID.
+- **Access Control**: (Optional) Verify that "premium" features are conditionally rendered based on the shop's plan.
 
 ## 5. Execution Steps
 
-1. [ ] **Backend**: Enhance `generateSafetyAudit` to compile full data and log to `audit_logs`.
-2. [ ] **Frontend**: Install `jspdf` and `jspdf-autotable`.
-3. [ ] **Frontend**: Implement the PDF mapping logic.
-4. [ ] **Frontend**: Update the `Audits` page with the new export button.
-5. [ ] **Verification**: Generate an audit, download the PDF, and check the `audit_logs`.
-6. [ ] **Commit**: `audit_generation_complete`.
+1. [ ] **Backend**: Update `shops` table and implement `createSubscription`.
+2. [ ] **Frontend**: Install `@stripe/stripe-js`.
+3. [ ] **Frontend**: Create the `Billing` page and "Upgrade" button logic.
+4. [ ] **Frontend**: Implement the "Success" callback logic to call the reducer.
+5. [ ] **Verification**: Perform a test checkout and verify the shop state change.
+6. [ ] **Commit**: `Stripe billing wired`.

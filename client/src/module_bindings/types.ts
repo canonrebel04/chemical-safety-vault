@@ -64,6 +64,8 @@ export const Shops = __t.object("Shops", {
   id: __t.identity(),
   name: __t.string(),
   owner: __t.identity(),
+  plan: __t.string(),
+  stripeSubscriptionId: __t.option(__t.string()),
 });
 export type Shops = __Infer<typeof Shops>;
 

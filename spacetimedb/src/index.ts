@@ -27,6 +27,8 @@ const spacetimedb = schema({
       id: t.identity().primaryKey(),
       name: t.string(),
       owner: t.identity().unique(),
+      plan: t.string(), // "free", "premium"
+      stripe_subscription_id: t.string().optional(),
     }
   ),
   users: table(
@@ -146,6 +148,8 @@ export const initUser = spacetimedb.reducer(
         id: ctx.sender,
         name: shopName,
         owner: ctx.sender,
+        plan: "free",
+        stripe_subscription_id: undefined,
       });
       ctx.db.users.insert({
         id: ctx.sender,
@@ -213,8 +217,30 @@ export const createShop = spacetimedb.reducer(
       id: ctx.sender,
       name,
       owner: ctx.sender,
+      plan: "free",
+      stripe_subscription_id: undefined,
     });
     logAction(ctx, ctx.sender, "CREATE_SHOP", `Shop '${name}' created manually.`);
+  }
+);
+
+/**
+ * Upgrade shop to premium plan.
+ */
+export const createSubscription = spacetimedb.reducer(
+  { subscription_id: t.string() },
+  (ctx, { subscription_id }) => {
+    const shop_id = getShopId(ctx);
+    const shop = ctx.db.shops.id.find(shop_id);
+    if (!shop) throw new Error("Shop not found");
+
+    ctx.db.shops.id.update({
+      ...shop,
+      plan: "premium",
+      stripe_subscription_id: subscription_id,
+    });
+
+    logAction(ctx, shop_id, "UPGRADE_PLAN", `Shop upgraded to premium. Subscription: ${subscription_id}`);
   }
 );
 

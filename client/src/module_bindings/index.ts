@@ -39,6 +39,7 @@ import AddInventoryItemReducer from "./add_inventory_item_reducer";
 import AttachSdsReducer from "./attach_sds_reducer";
 import CreateDeadlineReducer from "./create_deadline_reducer";
 import CreateShopReducer from "./create_shop_reducer";
+import CreateSubscriptionReducer from "./create_subscription_reducer";
 import DeleteSdsReducer from "./delete_sds_reducer";
 import GenerateSafetyAuditReducer from "./generate_safety_audit_reducer";
 import InitUserReducer from "./init_user_reducer";
@@ -197,6 +198,7 @@ const reducersSchema = __reducers(
   __reducerSchema("attach_sds", AttachSdsReducer),
   __reducerSchema("create_deadline", CreateDeadlineReducer),
   __reducerSchema("create_shop", CreateShopReducer),
+  __reducerSchema("create_subscription", CreateSubscriptionReducer),
   __reducerSchema("delete_sds", DeleteSdsReducer),
   __reducerSchema("generate_safety_audit", GenerateSafetyAuditReducer),
   __reducerSchema("init_user", InitUserReducer),

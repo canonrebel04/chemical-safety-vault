@@ -1,5 +1,5 @@
 import { Link, Outlet, useLocation } from 'react-router-dom';
-import { Home, Package, ShieldAlert, FileText, Calendar, Users } from 'lucide-react';
+import { Home, Package, ShieldAlert, FileText, Calendar, Users, CreditCard } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useDeadlineChecker } from '@/hooks/useDeadlineChecker';
 
@@ -14,6 +14,7 @@ export default function Layout() {
     { name: 'Spills', path: '/spills', icon: ShieldAlert },
     { name: 'Deadlines', path: '/deadlines', icon: Calendar },
     { name: 'Team', path: '/team', icon: Users },
+    { name: 'Billing', path: '/billing', icon: CreditCard },
   ];
 
   return (

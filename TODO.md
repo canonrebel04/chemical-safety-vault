@@ -1,21 +1,25 @@
-# TODO: Chemical Safety Vault Audit Generation
+# TODO: Chemical Safety Vault Stripe Billing
 
-- [x] **1. Backend: Enhanced Audit Logic** `[backend]` `[database]`
-  - [x] Refactor `generateSafetyAudit` reducer in `spacetimedb/src/index.ts`:
-    - [x] Add logic to compile full shop state (Inventory, Spills, Deadlines).
-    - [x] Implement automatic insertion of audit JSON snapshot into `audit_logs` table with action type `FULL_SAFETY_AUDIT`.
-- [x] **2. Frontend: Export Library Setup** `[frontend]` `[parallel]`
-  - [x] Install dependencies: `npm install jspdf jspdf-autotable` in `client/`.
-  - [x] Create a utility helper `client/src/lib/pdf-generator.ts` for OSHA report formatting.
-- [x] **3. Frontend: Export for OSHA UI** `[frontend]`
-  - [x] Update `client/src/pages/Audits.tsx`:
-    - [x] Add "Export for OSHA" button.
-    - [x] Implement logic to trigger `generateSafetyAudit` and then process the data into a PDF.
-    - [x] Add a loading/processing state for the export action.
-
-- [x] **4. Verification & Finalization** `[test]`
+- [x] **1. Backend Schema & Logic Updates** `[backend]` `[database]`
+  - [x] Update `shops` table in `spacetimedb/src/index.ts` to include `plan` (string) and `stripe_subscription_id` (string?).
+  - [x] Implement `createSubscription(subscription_id: string)` reducer:
+    - [x] Update user's shop record to "premium".
+    - [x] Store the stripe subscription ID.
+    - [x] Log the upgrade event in `audit_logs`.
+- [x] **2. Frontend Integration Setup** `[frontend]` `[parallel]`
+  - [x] Install Stripe JS: `npm install @stripe/stripe-js` in `client/`.
+  - [x] Add `VITE_STRIPE_PUBLISHABLE_KEY` placeholder to `client/.env.local`.
+- [x] **3. Billing Page Development** `[frontend]`
+  - [x] Create `client/src/pages/Billing.tsx`.
+  - [x] Implement UI to show current plan status (Free vs Premium).
+  - [x] Add "Upgrade to Premium" button ($59/mo).
+- [x] **4. Checkout & Success Flow** `[frontend]`
+  - [x] Implement Stripe Checkout redirect logic in `Billing.tsx`.
+  - [x] Add success callback logic:
+    - [x] Detect `?success=true` in URL parameters.
+    - [x] Call `reducers.createSubscription` with a mock/real subscription ID.
+- [x] **5. Verification & Finalization** `[test]`
   - [x] Regenerate client bindings: `npm run spacetime:generate`.
-  - [x] Verify that the audit snapshot is correctly stored in the `audit_logs` table.
-  - [x] Perform an end-to-end test: Generate audit -> Download PDF -> Verify content.
+  - [x] Verify that the shop record is correctly updated after a mock checkout.
   - [x] Run production build: `npm run build`.
-  - [x] Commit changes with message: `audit generation complete`.
+  - [x] Commit changes with message: `Stripe billing wired`.

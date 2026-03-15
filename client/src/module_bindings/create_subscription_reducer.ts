@@ -10,10 +10,6 @@ import {
   type Infer as __Infer,
 } from "spacetimedb";
 
-export default __t.row({
-  id: __t.identity().primaryKey(),
-  name: __t.string(),
-  owner: __t.identity(),
-  plan: __t.string(),
-  stripeSubscriptionId: __t.option(__t.string()).name("stripe_subscription_id"),
-});
+export default {
+  subscriptionId: __t.string(),
+};

@@ -1,56 +1,46 @@
-# TEST: Chemical Safety Vault Deadline System Verification
+# TEST: Chemical Safety Vault Audit Generation Verification
 
 ## Approved Test Plan
 
-1. **Backend Logic & Audit Integrity**:
-    - [ ] Verify `logDeadlineReminder` reducer and ownership checks.
-    - [ ] Verify production cron strategy comments.
+1. **Backend Logic & Persistence**:
+    - [ ] Verify `generateSafetyAudit` compiler logic.
+    - [ ] Confirm `FULL_SAFETY_AUDIT` JSON logging in `audit_logs`.
+    - [ ] Verify multi-tenant data isolation.
 
-2. **Frontend Hook (useDeadlineChecker)**:
-    - [ ] Verify scanning logic (overdue/upcoming).
-    - [ ] Verify redundant notification prevention (ref).
-    - [ ] Verify real-time table responsiveness.
+2. **Frontend PDF Generation Utility**:
+    - [ ] Inspect `pdf-generator.ts` mapping and formatting.
+    - [ ] Confirm `jsPDF` and `autotable` integration.
 
-3. **Notification System Integration**:
-    - [ ] Verify permission request logic.
-    - [ ] Confirm Sonner/Toast integration.
-    - [ ] Verify dual-channel alerts (Push + Toast).
-    - [ ] Confirm backend audit call.
+3. **UI/UX & Integration**:
+    - [ ] Verify "Export for OSHA" button and functionality.
+    - [ ] Confirm "Generate New Snapshot" reducer trigger.
+    - [ ] Verify Audit History list updates.
+    - [ ] Confirm loading states and toasts.
 
-4. **UI/UX & Integration**:
-    - [ ] Verify hook in `Layout.tsx`.
-    - [ ] Verify Toaster in `App.tsx`.
-    - [ ] Confirm indicator in `Team.tsx`.
-
-5. **Build Integrity**:
+4. **Build & Compilation**:
     - [ ] Run backend build.
     - [ ] Run frontend build.
 
 ## Test Execution Log
 
-1. **Backend Logic & Audit Integrity**:
-    - [x] Verify `logDeadlineReminder` reducer and ownership checks. (PASSED)
-    - [x] Verify production cron strategy comments. (PASSED)
+1. **Backend Logic & Persistence**:
+    - [x] Verify `generateSafetyAudit` compiler logic. (PASSED)
+    - [x] Confirm `FULL_SAFETY_AUDIT` JSON logging in `audit_logs`. (PASSED)
+    - [x] Verify multi-tenant data isolation. (PASSED)
 
-2. **Frontend Hook (useDeadlineChecker)**:
-    - [x] Verify scanning logic (overdue/upcoming). (PASSED)
-    - [x] Verify redundant notification prevention (ref). (PASSED)
-    - [x] Verify real-time table responsiveness. (PASSED)
+2. **Frontend PDF Generation Utility**:
+    - [x] Inspect `pdf-generator.ts` mapping and formatting. (PASSED)
+    - [x] Confirm `jsPDF` and `autotable` integration. (PASSED)
 
-3. **Notification System Integration**:
-    - [x] Verify permission request logic. (PASSED)
-    - [x] Confirm Sonner/Toast integration. (PASSED)
-    - [x] Verify dual-channel alerts (Push + Toast). (PASSED)
-    - [x] Confirm backend audit call. (PASSED)
+3. **UI/UX & Integration**:
+    - [x] Verify "Export for OSHA" button and functionality. (PASSED)
+    - [x] Confirm "Generate New Snapshot" reducer trigger. (PASSED)
+    - [x] Verify Audit History list updates. (PASSED)
+    - [x] Confirm loading states and toasts. (PASSED)
 
-4. **UI/UX & Integration**:
-    - [x] Verify hook in `Layout.tsx`. (PASSED)
-    - [x] Verify Toaster in `App.tsx`. (PASSED)
-    - [x] Confirm indicator in `Team.tsx`. (PASSED)
-
-5. **Build Integrity**:
+4. **Build & Compilation**:
     - [x] Run backend build. (PASSED)
     - [x] Run frontend build. (PASSED)
 
 ## Summary
-All tests passed. The Chemical Safety Vault now has a robust, multi-channel deadline notification system that proactively alerts users of upcoming and overdue compliance tasks while maintaining a secure audit trail.
+All tests passed. The audit generation system is fully operational, providing secure, multi-tenant vault snapshots and high-quality OSHA-compliant PDF exports directly from the user interface.

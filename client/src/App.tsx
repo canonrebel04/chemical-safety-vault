@@ -10,6 +10,7 @@ import Deadlines from './pages/Deadlines';
 import Audits from './pages/Audits';
 import Login from './pages/Login';
 import Team from './pages/Team';
+import Billing from './pages/Billing';
 import { AuthProvider } from './contexts/AuthContext';
 import ProtectedRoute from './components/ProtectedRoute';
 import { Toaster } from 'sonner';
@@ -54,6 +55,7 @@ function App() {
               <Route path="/deadlines" element={<Deadlines />} />
               <Route path="/audits" element={<Audits />} />
               <Route path="/team" element={<Team />} />
+              <Route path="/billing" element={<Billing />} />
             </Route>
           </Route>
 
