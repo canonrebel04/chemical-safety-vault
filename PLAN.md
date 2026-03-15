@@ -1,69 +1,59 @@
-# Plan: Chemical Safety Vault Mobile-First UI
+# Plan: Auth + Multi-Tenancy Locked
 
-This plan details the implementation of a mobile-first Progressive Web App (PWA) client for the Chemical Safety Vault using React, Tailwind CSS, shadcn/ui, and SpacetimeDB real-time subscriptions.
+This plan outlines the implementation of a robust authentication and multi-tenancy system for the Chemical Safety Vault using SpacetimeDB.
 
-## 1. Project Setup & Architecture
-- **Theme**: Set dark mode as the default in `tailwind.config.js` and `index.css`.
-- **Navigation**: Implement a mobile-first, React Native-style bottom navigation bar connecting the core views.
-- **Form Handling**: Integrate `react-hook-form` and `zod` for strict, type-safe form validation across all inputs.
-- **SpacetimeDB Integration**: Ensure the root component subscribes to all relevant tables (`shops`, `chemical_inventory`, `sds_documents`, `spill_reports`, `compliance_deadlines`, `audit_logs`) so data updates instantly across devices.
+## 1. Backend: Identity and Multi-Tenancy (`spacetimedb/src/index.ts`)
 
-## 2. Core Pages Implementation
+- **User & Shop Association**: 
+    - Keep the existing `shops` table.
+    - Add a `users` table: `id: Identity` (PK), `shop_id: Identity`, `email: string`, `role: string`.
+- **Automatic Shop Creation**: 
+    - Implement a `login` or `initUser` reducer.
+    - If `ctx.sender` does not exist in `users`, create a new `shops` record (where `owner = ctx.sender`) and a `users` record pointing to that shop.
+- **Invite Flow**:
+    - Implement an `inviteUser(email: string)` reducer: creates a pending invite.
+    - Implement an `acceptInvite(shop_id: Identity)` reducer: updates the user's `shop_id` to the invited shop.
+- **Strict Enforcement**:
+    - Every data-modifying reducer must look up the user's `shop_id` from the `users` table and use it for the operation.
+    - Validate that the user belongs to the shop they are trying to modify.
 
-### 2.1 Dashboard (`/dashboard`)
-- **Purpose**: Real-time overview of the shop's status.
-- **Components**:
-    - Live inventory summary table.
-    - Quick metrics (total chemicals, recent spills, upcoming deadlines).
-    - Utilizes SpacetimeDB React hooks (`useChemicalInventoryTable`, etc.) for reactive updates.
+## 2. Frontend: Authentication & Protected Routes (`client/`)
 
-### 2.2 Inventory (`/inventory`)
-- **Purpose**: Manage chemical stock.
-- **Components**:
-    - List view of all chemicals.
-    - "Add Item" floating action button (FAB) or prominent top button.
-    - Add/Edit Item Form (using `react-hook-form` + `zod`):
-        - Fields: CAS Number, Name, Quantity, Unit, Location.
-    - *Placeholder*: A UI button indicating "Scan Barcode" (action doesn't need native device integration yet, just the UI layout).
+- **Auth State Management**:
+    - Utilize SpacetimeDB's built-in identity management.
+    - Create an `AuthContext` or use `useSpacetimeDB` to track if the user is "logged in" (identity exists and user record is initialized).
+- **Login/Register Page**:
+    - A simple view to initiate the connection. Since SpacetimeDB handles the identity, this might just be a "Get Started" button that triggers the initial reducer.
+- **Route Protection**:
+    - Implement a `ProtectedRoute` component that redirects to `/` or `/login` if no identity is present.
+    - Protect `/dashboard`, `/inventory`, `/sds`, `/spills`, `/deadlines`, `/audits`.
+- **Multi-Tenant Subscriptions**:
+    - Update subscriptions in `main.tsx` to use server-side filtering (if supported by the SDK version) or ensure the frontend logic only displays data matching the user's `shop_id`.
+- **Logout**:
+    - Clear the auth token from `localStorage` and reset the SpacetimeDB connection.
 
-### 2.3 SDS Management (`/sds`)
-- **Purpose**: Safety Data Sheet uploads and links.
-- **Components**:
-    - Drag-and-drop file upload zone.
-    - Form to link the file to a specific `chemical_id`.
-    - Connection to the `uploadSDS` reducer.
-    - *Note*: Mock the S3 presigned URL generation client-side or use a placeholder URL for the MVP, focusing on calling the reducer correctly.
+## 3. Invite UI
 
-### 2.4 Spill Logs (`/spills`)
-- **Purpose**: Reporting safety incidents.
-- **Components**:
-    - List of recent spills.
-    - "Log Spill" Form (`react-hook-form` + `zod`):
-        - Fields: Chemical (dropdown), Amount Spilled, Description, Actions Taken, Witnesses.
+- Add a "Team" or "Settings" section in `/dashboard` or a new page.
+- Display the current `shop_id` (as a shareable code/link).
+- Form to "Join Shop" by entering a `shop_id`.
 
-### 2.5 Compliance Deadlines (`/deadlines`)
-- **Purpose**: Tracking OSHA/EPA dates.
-- **Components**:
-    - Calendar or chronological list view.
-    - Highlighting/Color-coding for overdue or upcoming deadlines.
-    - "Add Deadline" Form.
+## 4. Testing & Verification
 
-### 2.6 Audits (`/audits`)
-- **Purpose**: Generate compliance reports.
-- **Components**:
-    - "Generate Safety Audit" button (calls the `generateSafetyAudit` reducer).
-    - Display the generated JSON report.
-    - "Download Report" button (converts JSON to a downloadable file).
+- **Isolation Test**: 
+    - Create User A -> Add chemical "Acetone".
+    - Create User B -> Verify User B cannot see "Acetone".
+- **Invite Test**:
+    - User A invites User B.
+    - User B joins Shop A.
+    - Verify User B can now see "Acetone".
 
-## 3. UI/UX Details
-- Utilize `shadcn/ui` components (Cards, Inputs, Buttons, Forms, Tables).
-- Ensure padding, touch targets, and typography are optimized for mobile devices (min 44px touch targets).
+## 5. Execution Steps
 
-## 4. Execution Steps
-1. [ ] Configure Dark Mode and core Layout (Bottom Nav).
-2. [ ] Set up SpacetimeDB global subscriptions.
-3. [ ] Build Dashboard and Inventory pages (with forms).
-4. [ ] Build SDS, Spills, and Deadlines pages.
-5. [ ] Build Audits page and download logic.
-6. [ ] Verify PWA responsiveness and real-time sync.
-7. [ ] Final Commit: `mobile-first UI complete`.
+1. [ ] **Backend**: Update schema with `users` and `invites` tables.
+2. [ ] **Backend**: Implement `initUser`, `inviteUser`, and `acceptInvite` reducers.
+3. [ ] **Backend**: Refactor existing reducers to pull `shop_id` from the `users` table.
+4. [ ] **Frontend**: Implement `AuthContext` and `ProtectedRoute`.
+5. [ ] **Frontend**: Build Login and Team management UI.
+6. [ ] **Verification**: Run multi-user isolation tests.
+7. [ ] **Commit**: `auth + multi-tenancy locked`.
