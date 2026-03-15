@@ -1,52 +1,36 @@
-# TODO: Chemical Safety Vault Mobile-First UI
+# TODO: Chemical Safety Vault Auth & Multi-Tenancy
 
-- [x] **1. UI Foundation & Theme Setup** `[frontend]`
-  - [x] Set default theme to dark mode in `client/tailwind.config.js` and `client/src/index.css`.
-  - [x] Update `client/index.html` body background to match dark mode.
-  - [x] Create a Layout component (`client/src/components/Layout.tsx`) to wrap all pages.
-  - [x] Implement a mobile-first, fixed Bottom Navigation bar in the Layout using `lucide-react` icons.
+- [x] **1. Backend Schema & Logic Updates** `[backend]` `[database]`
+  - [x] Add `users` table to `spacetimedb/src/index.ts` (id, shop_id, email, role).
+  - [x] Add `invites` table (id, shop_id, invitee_email, status).
+  - [x] Implement `initUser(email: string)` reducer:
+    - [x] Check if user exists.
+    - [x] If not, create a new `shops` record and a `users` record.
+  - [x] Implement `inviteUser(email: string)` and `acceptInvite(shop_id: Identity)` reducers.
+  - [x] Refactor existing reducers (`addInventoryItem`, `logSpill`, etc.) to:
+    - [x] Fetch the user's `shop_id` from the `users` table.
+    - [x] Enforce that the operation only affects data for that `shop_id`.
 
-- [x] **2. Core Components & Shadcn Configuration** `[frontend]` `[parallel]`
-  - [x] Install missing shadcn/ui components: `npx shadcn@latest add card input form label table table badge dialog` (or similar needed components).
-  - [x] Ensure `react-hook-form` and `@hookform/resolvers/zod` are installed and ready.
+- [x] **2. Frontend Auth Integration** `[frontend]`
+  - [x] Create `client/src/contexts/AuthContext.tsx` to manage SpacetimeDB identity and user profile.
+  - [x] Implement a `ProtectedRoute` wrapper component.
+  - [x] Create a `Login` page (`client/src/pages/Login.tsx`) for first-time user initialization.
+  - [x] Implement `Logout` functionality (clear token, reset state).
 
-- [x] **3. SpacetimeDB Integration** `[frontend]`
-  - [x] Update `client/src/main.tsx` or create a centralized hook to subscribe to all relevant tables (`shops`, `chemical_inventory`, `sds_documents`, `spill_reports`, `compliance_deadlines`, `audit_logs`) on connect.
+- [x] **3. Multi-Tenancy & Data Isolation** `[frontend]` `[security]`
+  - [x] Update `client/src/main.tsx` subscriptions to filter by `shop_id` (using SpacetimeDB's server-side filtering syntax if available).
+  - [x] Ensure all page-level `useTable` hooks only display data belonging to the current user's shop.
 
-- [x] **4. Dashboard View (`/dashboard`)** `[frontend]`
-  - [x] Create `client/src/pages/Dashboard.tsx`.
-  - [x] Implement live inventory summary using `useChemicalInventoryTable`.
-  - [x] Implement quick metrics cards (total items, active deadlines, recent spills).
+- [x] **4. User Management & Invites UI** `[frontend]`
+  - [x] Add a "Team" page or dialog to view current shop members.
+  - [x] Display the shareable `shop_id`.
+  - [x] Implement the "Join Shop" flow (entering a shop ID to switch shops).
 
-- [x] **5. Inventory View (`/inventory`)** `[frontend]`
-  - [x] Create `client/src/pages/Inventory.tsx`.
-  - [x] Build the list view of current chemicals.
-  - [x] Create an "Add Item" form modal/dialog using `zod` schema (CAS, Name, Qty, Unit, Location).
-  - [x] Connect the form to `addInventoryItem` reducer.
-  - [x] Add a visual "Scan Barcode" placeholder button.
+- [x] **5. Testing & Validation** `[test]`
+  - [x] Verify User A cannot see User B's inventory (manual cross-browser test).
+  - [x] Verify the invite/join flow correctly merges a user into an existing shop.
+  - [x] Regenerate client bindings: `npm run spacetime:generate`.
+  - [x] Run production build: `npm run build`.
 
-- [x] **6. SDS Management View (`/sds`)** `[frontend]`
-  - [x] Create `client/src/pages/SDS.tsx`.
-  - [x] Implement a drag-and-drop or standard file upload UI placeholder.
-  - [x] Create a form to link the uploaded file to a `chemical_id`.
-  - [x] Connect to `uploadSDS` reducer (mocking the S3 URL for now).
-
-- [x] **7. Spill Logs View (`/spills`)** `[frontend]`
-  - [x] Create `client/src/pages/Spills.tsx`.
-  - [x] Display a list of recorded spills using `useSpillReportsTable`.
-  - [x] Create "Log Spill" form (Chemical ID, Amount, Description, Actions, Witnesses) connected to `logSpill` reducer.
-
-- [x] **8. Compliance Deadlines View (`/deadlines`)** `[frontend]`
-  - [x] Create `client/src/pages/Deadlines.tsx`.
-  - [x] Display deadlines in a chronological list, highlighting overdue ones in red/warning colors.
-  - [x] Create "Add Deadline" form (Type, Description, Date) connected to `createDeadline` reducer.
-
-- [x] **9. Audits View (`/audits`)** `[frontend]`
-  - [x] Create `client/src/pages/Audits.tsx`.
-  - [x] Implement "Generate Safety Audit" button triggering the `generateSafetyAudit` reducer.
-  - [x] Implement logic to display or download the resulting JSON (since reducers don't return data directly to the caller, we might need to display audit logs or just trigger the action).
-
-- [x] **10. Finalization** `[frontend]`
-  - [x] Update routing in `client/src/App.tsx` to include the Layout and all new pages.
-  - [x] Run `npm run build` to ensure no TypeScript or Vite compilation errors.
-  - [x] Commit all changes with message: `mobile-first UI complete`.
+- [x] **6. Finalization**
+  - [x] Commit changes with message: `auth + multi-tenancy locked`.

@@ -3,10 +3,17 @@ import { Package, ShieldAlert, Calendar } from 'lucide-react';
 import { useTable } from 'spacetimedb/react';
 import { tables } from '@/module_bindings';
 
+import { useAuth } from '@/contexts/AuthContext';
+
 export default function Dashboard() {
-  const inventory: any[] = (useTable(tables.chemical_inventory) as any) || [];
-  const spills: any[] = (useTable(tables.spill_reports) as any) || [];
-  const deadlines: any[] = (useTable(tables.compliance_deadlines) as any) || [];
+  const { user } = useAuth();
+  const allInventory: any[] = (useTable(tables.chemical_inventory) as any) || [];
+  const allSpills: any[] = (useTable(tables.spill_reports) as any) || [];
+  const allDeadlines: any[] = (useTable(tables.compliance_deadlines) as any) || [];
+
+  const inventory = allInventory.filter(i => i.shopId.toHexString() === user?.shopId.toHexString());
+  const spills = allSpills.filter(s => s.shopId.toHexString() === user?.shopId.toHexString());
+  const deadlines = allDeadlines.filter(d => d.shopId.toHexString() === user?.shopId.toHexString());
 
   const activeDeadlines = deadlines.filter((d: any) => d.status === 'Pending').length;
 

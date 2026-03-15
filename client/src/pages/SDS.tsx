@@ -17,9 +17,15 @@ const formSchema = z.object({
   file: z.any().refine((files) => files?.length == 1, 'File is required.'),
 });
 
+import { useAuth } from '@/contexts/AuthContext';
+
 export default function SDS() {
-  const inventory: any[] = (useTable(tables.chemical_inventory) as any) || [];
-  const sdsDocs: any[] = (useTable(tables.sds_documents) as any) || [];
+  const { user } = useAuth();
+  const allInventory: any[] = (useTable(tables.chemical_inventory) as any) || [];
+  const allSdsDocs: any[] = (useTable(tables.sds_documents) as any) || [];
+  
+  const inventory = allInventory.filter(i => i.shopId.toHexString() === user?.shopId.toHexString());
+  const sdsDocs = allSdsDocs.filter(d => d.shopId.toHexString() === user?.shopId.toHexString());
   const [isUploading, setIsUploading] = useState(false);
   const uploadSds = useReducer(reducers.uploadSds);
 

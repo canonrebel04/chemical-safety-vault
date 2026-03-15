@@ -19,8 +19,12 @@ const formSchema = z.object({
   location: z.string().min(1, 'Location is required'),
 });
 
+import { useAuth } from '@/contexts/AuthContext';
+
 export default function Inventory() {
-  const inventory: any[] = (useTable(tables.chemical_inventory) as any) || [];
+  const { user } = useAuth();
+  const allInventory: any[] = (useTable(tables.chemical_inventory) as any) || [];
+  const inventory = allInventory.filter(i => i.shopId.toHexString() === user?.shopId.toHexString());
   const [isAddOpen, setIsAddOpen] = useState(false);
   const addInventoryItem = useReducer(reducers.addInventoryItem);
 

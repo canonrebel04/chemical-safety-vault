@@ -42,6 +42,14 @@ export const ComplianceDeadlines = __t.object("ComplianceDeadlines", {
 });
 export type ComplianceDeadlines = __Infer<typeof ComplianceDeadlines>;
 
+export const Invites = __t.object("Invites", {
+  id: __t.u32(),
+  shopId: __t.identity(),
+  inviteeEmail: __t.string(),
+  status: __t.string(),
+});
+export type Invites = __Infer<typeof Invites>;
+
 export const SdsDocuments = __t.object("SdsDocuments", {
   id: __t.u32(),
   shopId: __t.identity(),
@@ -70,4 +78,12 @@ export const SpillReports = __t.object("SpillReports", {
   witnesses: __t.string(),
 });
 export type SpillReports = __Infer<typeof SpillReports>;
+
+export const Users = __t.object("Users", {
+  id: __t.identity(),
+  shopId: __t.identity(),
+  email: __t.string(),
+  role: __t.string(),
+});
+export type Users = __Infer<typeof Users>;
 

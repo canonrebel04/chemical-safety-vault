@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Link, Navigate } from 'react-router-dom';
 import { Button } from './components/ui/button';
 import { ShieldAlert } from 'lucide-react';
 import Layout from './components/Layout';
@@ -8,6 +8,10 @@ import SDS from './pages/SDS';
 import Spills from './pages/Spills';
 import Deadlines from './pages/Deadlines';
 import Audits from './pages/Audits';
+import Login from './pages/Login';
+import Team from './pages/Team';
+import { AuthProvider } from './contexts/AuthContext';
+import ProtectedRoute from './components/ProtectedRoute';
 
 const LandingPage = () => {
   return (
@@ -20,11 +24,13 @@ const LandingPage = () => {
         The ultimate safety companion for auto-parts & small blender shops. 
         Securely log, track, and manage chemical safety data offline or online.
       </p>
-      <Link to="/dashboard">
-        <Button size="lg" className="text-lg px-8 py-6">
-          Launch App
-        </Button>
-      </Link>
+      <div className="flex gap-4">
+        <Link to="/login">
+          <Button size="lg" className="text-lg px-8 py-6">
+            Get Started
+          </Button>
+        </Link>
+      </div>
     </div>
   );
 };
@@ -32,17 +38,26 @@ const LandingPage = () => {
 function App() {
   return (
     <Router>
-      <Routes>
-        <Route path="/" element={<LandingPage />} />
-        <Route element={<Layout />}>
-          <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/inventory" element={<Inventory />} />
-          <Route path="/sds" element={<SDS />} />
-          <Route path="/spills" element={<Spills />} />
-          <Route path="/deadlines" element={<Deadlines />} />
-          <Route path="/audits" element={<Audits />} />
-        </Route>
-      </Routes>
+      <AuthProvider>
+        <Routes>
+          <Route path="/" element={<LandingPage />} />
+          <Route path="/login" element={<Login />} />
+          
+          <Route element={<ProtectedRoute />}>
+            <Route element={<Layout />}>
+              <Route path="/dashboard" element={<Dashboard />} />
+              <Route path="/inventory" element={<Inventory />} />
+              <Route path="/sds" element={<SDS />} />
+              <Route path="/spills" element={<Spills />} />
+              <Route path="/deadlines" element={<Deadlines />} />
+              <Route path="/audits" element={<Audits />} />
+              <Route path="/team" element={<Team />} />
+            </Route>
+          </Route>
+
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
+      </AuthProvider>
     </Router>
   );
 }

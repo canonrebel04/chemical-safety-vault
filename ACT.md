@@ -1,4 +1,5 @@
-# ACT: Implementation Log - Mobile-First UI
+# ACT: Implementation Log - Auth & Multi-Tenancy
 
-## [2026-03-15] 1. UI Foundation & Theme Setup
-- [2026-03-15 14:00] Initialized `ACT.md` for Mobile-First UI task.
+## [2026-03-15] 1. Backend Schema & Logic Updates
+- [2026-03-15 15:30] Initialized `ACT.md`.
+- [2026-03-15 15:31] Reading `spacetimedb/src/index.ts`.

@@ -20,8 +20,12 @@ const formSchema = z.object({
   dueDate: z.string().min(1, 'Due date is required'),
 });
 
+import { useAuth } from '@/contexts/AuthContext';
+
 export default function Deadlines() {
-  const deadlines: any[] = (useTable(tables.compliance_deadlines) as any) || [];
+  const { user } = useAuth();
+  const allDeadlines: any[] = (useTable(tables.compliance_deadlines) as any) || [];
+  const deadlines = allDeadlines.filter(d => d.shopId.toHexString() === user?.shopId.toHexString());
   const [isAddOpen, setIsAddOpen] = useState(false);
   const createDeadline = useReducer(reducers.createDeadline);
 

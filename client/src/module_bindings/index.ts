@@ -34,10 +34,13 @@ import {
 } from "spacetimedb";
 
 // Import all reducer arg schemas
+import AcceptInviteReducer from "./accept_invite_reducer";
 import AddInventoryItemReducer from "./add_inventory_item_reducer";
 import CreateDeadlineReducer from "./create_deadline_reducer";
 import CreateShopReducer from "./create_shop_reducer";
 import GenerateSafetyAuditReducer from "./generate_safety_audit_reducer";
+import InitUserReducer from "./init_user_reducer";
+import InviteUserReducer from "./invite_user_reducer";
 import LogSpillReducer from "./log_spill_reducer";
 import UpdateQuantityReducer from "./update_quantity_reducer";
 import UploadSdsReducer from "./upload_sds_reducer";
@@ -48,9 +51,11 @@ import UploadSdsReducer from "./upload_sds_reducer";
 import AuditLogsRow from "./audit_logs_table";
 import ChemicalInventoryRow from "./chemical_inventory_table";
 import ComplianceDeadlinesRow from "./compliance_deadlines_table";
+import InvitesRow from "./invites_table";
 import SdsDocumentsRow from "./sds_documents_table";
 import ShopsRow from "./shops_table";
 import SpillReportsRow from "./spill_reports_table";
+import UsersRow from "./users_table";
 
 /** Type-only namespace exports for generated type groups. */
 
@@ -98,6 +103,23 @@ const tablesSchema = __schema({
       { name: 'compliance_deadlines_id_key', constraint: 'unique', columns: ['id'] },
     ],
   }, ComplianceDeadlinesRow),
+  invites: __table({
+    name: 'invites',
+    indexes: [
+      { accessor: 'id', name: 'invites_id_idx_btree', algorithm: 'btree', columns: [
+        'id',
+      ] },
+      { accessor: 'invitee_email', name: 'invites_invitee_email_idx_btree', algorithm: 'btree', columns: [
+        'inviteeEmail',
+      ] },
+      { accessor: 'shop_id', name: 'invites_shop_id_idx_btree', algorithm: 'btree', columns: [
+        'shopId',
+      ] },
+    ],
+    constraints: [
+      { name: 'invites_id_key', constraint: 'unique', columns: ['id'] },
+    ],
+  }, InvitesRow),
   sds_documents: __table({
     name: 'sds_documents',
     indexes: [
@@ -144,14 +166,35 @@ const tablesSchema = __schema({
       { name: 'spill_reports_id_key', constraint: 'unique', columns: ['id'] },
     ],
   }, SpillReportsRow),
+  users: __table({
+    name: 'users',
+    indexes: [
+      { accessor: 'email', name: 'users_email_idx_btree', algorithm: 'btree', columns: [
+        'email',
+      ] },
+      { accessor: 'id', name: 'users_id_idx_btree', algorithm: 'btree', columns: [
+        'id',
+      ] },
+      { accessor: 'shop_id', name: 'users_shop_id_idx_btree', algorithm: 'btree', columns: [
+        'shopId',
+      ] },
+    ],
+    constraints: [
+      { name: 'users_email_key', constraint: 'unique', columns: ['email'] },
+      { name: 'users_id_key', constraint: 'unique', columns: ['id'] },
+    ],
+  }, UsersRow),
 });
 
 /** The schema information for all reducers in this module. This is defined the same way as the reducers would have been defined in the server, except the body of the reducer is omitted in code generation. */
 const reducersSchema = __reducers(
+  __reducerSchema("accept_invite", AcceptInviteReducer),
   __reducerSchema("add_inventory_item", AddInventoryItemReducer),
   __reducerSchema("create_deadline", CreateDeadlineReducer),
   __reducerSchema("create_shop", CreateShopReducer),
   __reducerSchema("generate_safety_audit", GenerateSafetyAuditReducer),
+  __reducerSchema("init_user", InitUserReducer),
+  __reducerSchema("invite_user", InviteUserReducer),
   __reducerSchema("log_spill", LogSpillReducer),
   __reducerSchema("update_quantity", UpdateQuantityReducer),
   __reducerSchema("upload_sds", UploadSdsReducer),

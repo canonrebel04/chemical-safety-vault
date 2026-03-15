@@ -1,5 +1,5 @@
 import { Link, Outlet, useLocation } from 'react-router-dom';
-import { Home, Package, ShieldAlert, FileText, Calendar, FileJson } from 'lucide-react';
+import { Home, Package, ShieldAlert, FileText, Calendar, Users } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 export default function Layout() {
@@ -11,7 +11,7 @@ export default function Layout() {
     { name: 'SDS', path: '/sds', icon: FileText },
     { name: 'Spills', path: '/spills', icon: ShieldAlert },
     { name: 'Deadlines', path: '/deadlines', icon: Calendar },
-    { name: 'Audits', path: '/audits', icon: FileJson },
+    { name: 'Team', path: '/team', icon: Users },
   ];
 
   return (

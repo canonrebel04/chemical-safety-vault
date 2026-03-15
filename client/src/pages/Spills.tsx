@@ -21,9 +21,15 @@ const formSchema = z.object({
   witnesses: z.string().optional(),
 });
 
+import { useAuth } from '@/contexts/AuthContext';
+
 export default function Spills() {
-  const inventory: any[] = (useTable(tables.chemical_inventory) as any) || [];
-  const spills: any[] = (useTable(tables.spill_reports) as any) || [];
+  const { user } = useAuth();
+  const allInventory: any[] = (useTable(tables.chemical_inventory) as any) || [];
+  const allSpills: any[] = (useTable(tables.spill_reports) as any) || [];
+
+  const inventory = allInventory.filter(i => i.shopId.toHexString() === user?.shopId.toHexString());
+  const spills = allSpills.filter(s => s.shopId.toHexString() === user?.shopId.toHexString());
   const [isAddOpen, setIsAddOpen] = useState(false);
   const logSpill = useReducer(reducers.logSpill);
 
