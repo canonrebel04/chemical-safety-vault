@@ -42,7 +42,11 @@ Managing chemical safety data in a fast-paced workshop environment is critical y
    cd ../spacetimedb && npm install
    ```
 
-3. **Run Locally:**
+3. **Run Locally (One-Liner):**
+   ```bash
+   spacetime dev --module-path spacetimedb & cd client && npm run dev
+   ```
+   *(Or run them in separate terminals as shown below)*
    ```bash
    # From project root, start SpacetimeDB
    spacetime dev --module-path spacetimedb
@@ -55,7 +59,13 @@ Managing chemical safety data in a fast-paced workshop environment is critical y
 
 ## 🚀 Deployment
 
-To deploy to SpacetimeDB Maincloud:
+To deploy the entire stack to SpacetimeDB Maincloud and prepare the frontend (One-Liner):
+
+```bash
+spacetime publish --server maincloud chemical-safety-vault --module-path spacetimedb && cd client && npm run spacetime:generate && npm run build
+```
+
+*(Or run the steps individually)*
 
 1. **Publish Backend:**
    ```bash

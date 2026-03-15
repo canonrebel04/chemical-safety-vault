@@ -12,6 +12,7 @@ import { useTable, useReducer } from 'spacetimedb/react';
 import { tables, reducers } from '@/module_bindings';
 import { offlineManager } from '@/lib/offline-drafts';
 import { toast } from 'sonner';
+import { BarcodeScanner } from '@/components/BarcodeScanner';
 
 const formSchema = z.object({
   casNumber: z.string().min(1, 'CAS Number is required'),
@@ -28,6 +29,7 @@ export default function Inventory() {
   const allInventory: any[] = (useTable(tables.chemical_inventory) as any) || [];
   const inventory = allInventory.filter(i => i.shopId.toHexString() === user?.shopId.toHexString());
   const [isAddOpen, setIsAddOpen] = useState(false);
+  const [isScannerOpen, setIsScannerOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const addInventoryItem = useReducer(reducers.addInventoryItem);
 
@@ -71,6 +73,20 @@ export default function Inventory() {
       setIsSubmitting(false);
     }
   }
+
+  const handleScan = (result: string) => {
+    setIsScannerOpen(false);
+    // If it looks like a CAS number or a name, we can try to fill the form
+    // Simple heuristic: if it has dashes and numbers, it might be a CAS
+    if (/^[0-9]+-[0-9]+-[0-9]+$/.test(result)) {
+      form.setValue('casNumber', result);
+      toast.success(`Scanned CAS: ${result}`);
+    } else {
+      form.setValue('name', result);
+      toast.success(`Scanned Name: ${result}`);
+    }
+    setIsAddOpen(true);
+  };
 
   return (
     <div className="space-y-6">
@@ -165,10 +181,21 @@ export default function Inventory() {
         </Dialog>
       </div>
 
-      <Button variant="outline" className="w-full gap-2 py-6 border-dashed border-2">
+      <Button 
+        variant="outline" 
+        className="w-full gap-2 py-6 border-dashed border-2 hover:bg-primary/5 hover:border-primary/50 transition-all"
+        onClick={() => setIsScannerOpen(true)}
+      >
         <QrCode className="h-5 w-5" />
-        Scan Barcode (Placeholder)
+        Launch Barcode Scanner
       </Button>
+
+      {isScannerOpen && (
+        <BarcodeScanner 
+          onScan={handleScan} 
+          onClose={() => setIsScannerOpen(false)} 
+        />
+      )}
 
       <div className="space-y-4">
         {inventory.map((item: any) => (

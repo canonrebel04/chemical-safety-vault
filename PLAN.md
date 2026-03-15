@@ -1,48 +1,59 @@
-# Plan: MVP Ready for Launch
+# Plan: Codebase Review and v0.1 Improvements
 
-This plan outlines the final steps to polish the Chemical Safety Vault for its MVP release, focusing on offline capabilities, data portability, and production readiness.
+This plan details the review findings, suggested v0.1 features, and a testing strategy for real-world validation with shop owners.
 
-## 1. PWA & Offline Enhancements (`client/`)
+## 1. Codebase Review Summary
+- **Architecture**: Robust PWA setup with SpacetimeDB for real-time sync and data persistence.
+- **Security**: Multi-tenancy is strictly enforced via `shop_id` in both backend reducers and frontend filters.
+- **PWA Features**: Includes offline drafts, install prompts, and service-worker caching.
+- **Integrations**: Stripe billing and S3 upload flows are ready for test mode.
 
-- **Install Prompt**: Implement a "beforeinstallprompt" handler to show a custom "Install App" button in the UI (e.g., in the Dashboard or Team page).
-- **Offline Form Caching**: 
-    - Update `service-worker.js` to handle basic `POST`/Reducer request interception OR implement a `localStorage` based draft system for chemical inventory and spill reports.
-    - If offline, save the form data to a `drafts` key.
-    - When back online, notify the user to "Sync Drafts".
-- **Visual Feedback**:
-    - Ensure all buttons show loading spinners (using `lucide-react`'s `Loader2`) during SpacetimeDB reducer calls.
-    - Implement global error handling using `sonner` toasts for failed reducer calls.
+## 2. Suggested Quick Improvements (v0.1)
 
-## 2. Compliance: Data Export (`client/src/pages/Audits.tsx`)
+1. **Integrated Barcode Scanner**: 
+   - Replace the placeholder in `Inventory.tsx` with `html5-qrcode`.
+   - Allow technicians to scan chemicals directly using their phone's camera.
+2. **OSHA Regulation Auto-Sync (Mock)**:
+   - Add a "Sync OSHA Deadlines" button in `Deadlines.tsx`.
+   - Auto-populate standard regulatory dates (e.g., "Annual Hazard Communication Training") based on the current year.
+3. **Professional Report Branding**:
+   - Enhance `pdf-generator.ts` with a high-fidelity header and custom footer including the vault's "Confidential" seal.
+4. **SDS Expiry Proactive Alerts**:
+   - Update `useDeadlineChecker.ts` to also scan `sds_documents` for upcoming expiry dates.
+5. **Team Activity Feed**:
+   - Add a "Recent Activity" card to the `Dashboard.tsx` that displays the last 5 entries from `audit_logs` for that shop.
 
-- **Export All Logic**: 
-    - A new utility to compile the entire shop's data into **JSON** and **CSV**.
-    - CSV files for: `Inventory`, `Spills`, `Deadlines`.
-    - Provide a single "Download Compliance Bundle (ZIP/Multiple)" or individual buttons.
-- **UI**: Add an "Export All Shop Data" section to the Audits page.
+## 3. Shop-Owner Testing Task List
 
-## 3. Documentation & Deployment (`README.md`)
+### Goals
+- Validate the "offline-first" value proposition.
+- Assess the ease of use for non-technical workshop staff.
+- Confirm if the generated PDF meets their compliance needs.
 
-- **Local Development**:
-    - Detailed `spacetime dev` instructions.
-    - How to run the Vite dev server.
-- **Production Deployment**:
-    - Command: `spacetime publish --server maincloud chemical-safety-vault`.
-    - Mention that bindings need to be regenerated after schema changes.
-- **Environment Variables**:
-    - Document `VITE_SPACETIMEDB_HOST`, `VITE_STRIPE_PUBLISHABLE_KEY`, and S3 bucket details.
+### What to Ask
+- "What's your current method for tracking chemical safety logs (e.g., binder, Excel, memory)?"
+- "How often does your shop lose Wi-Fi, and would a 'draft' mode save you time?"
+- "Does this PDF report look like something you could hand to an OSHA inspector with confidence?"
 
-## 4. Final Verification
+### Demo Sequence
+1. **The Live Vault**: Add an item on phone A, show it appearing instantly on phone B.
+2. **Offline Resilience**: Toggle 'Airplane Mode', log a mock spill, turn Wi-Fi back on, and sync the draft.
+3. **One-Click Audit**: Generate the OSHA PDF and show the immediate audit log entry.
 
-- **PWA Audit**: Run a Lighthouse report to verify PWA installability and offline support.
-- **End-to-End**: Create a new shop, add an item, upload an SDS, generate an audit, and upgrade to premium.
-- **Live Test**: Run a mock `spacetime publish` and show the placeholder URL.
+## 4. Execution Commands
 
-## 5. Execution Steps
+### Run Locally
+```bash
+spacetime dev --module-path spacetimedb & cd client && npm run dev
+```
 
-1. [ ] **Frontend**: Implement PWA install prompt and "Offline Drafts" UI.
-2. [ ] **Frontend**: Add loading states and error toasts to all forms.
-3. [ ] **Frontend**: Implement CSV/JSON export for all tables.
-4. [ ] **Documentation**: Update `README.md` with complete setup and deploy guides.
-5. [ ] **Deployment**: Run mock publish and verify live state.
-6. [ ] **Commit**: `MVP ready for launch`.
+### Deploy to Production
+```bash
+spacetime publish --server maincloud chemical-safety-vault --module-path spacetimedb
+```
+
+## 5. Next Steps
+1. [ ] Implement the Barcode Scanner.
+2. [ ] Polish the PDF Export Branding.
+3. [ ] Conduct the 3 shop-owner interviews.
+4. [ ] Refine roadmap based on feedback.

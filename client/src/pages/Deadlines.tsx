@@ -21,12 +21,14 @@ const formSchema = z.object({
 });
 
 import { useAuth } from '@/contexts/AuthContext';
+import { toast } from 'sonner';
 
 export default function Deadlines() {
   const { user } = useAuth();
   const allDeadlines: any[] = (useTable(tables.compliance_deadlines) as any) || [];
   const deadlines = allDeadlines.filter(d => d.shopId.toHexString() === user?.shopId.toHexString());
   const [isAddOpen, setIsAddOpen] = useState(false);
+  const [isSyncing, setIsSyncing] = useState(false);
   const createDeadline = useReducer(reducers.createDeadline);
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -49,18 +51,54 @@ export default function Deadlines() {
     form.reset();
   }
 
+  const handleSyncOSHA = async () => {
+    setIsSyncing(true);
+    toast.info("Syncing OSHA regulations...");
+    
+    // Mock standard compliance dates for the current year
+    const currentYear = new Date().getFullYear();
+    const standardDeadlines = [
+      { type: "OSHA", description: "Annual Hazard Communication Training", date: new Date(currentYear, 2, 1) }, // March 1st
+      { type: "OSHA", description: "Form 300A Summary Posting", date: new Date(currentYear, 1, 1) }, // Feb 1st
+      { type: "EPA", description: "Tier II Chemical Inventory Report", date: new Date(currentYear, 2, 1) }, // March 1st
+    ];
+
+    try {
+      for (const item of standardDeadlines) {
+        // Simple check to avoid exact duplicates (in a real app, you'd check more robustly)
+        const exists = deadlines.some(d => d.description === item.description && new Date(Number(d.dueDate) / 1000).getFullYear() === currentYear);
+        if (!exists) {
+           await createDeadline({
+            type: item.type,
+            description: item.description,
+            dueDate: Timestamp.fromDate(item.date)
+          });
+        }
+      }
+      toast.success("Standard regulations synced successfully.");
+    } catch (e) {
+      toast.error("Failed to sync regulations.");
+    } finally {
+      setIsSyncing(false);
+    }
+  };
+
   const now = new Date();
 
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="text-3xl font-bold tracking-tight">Deadlines</h1>
-        <Dialog open={isAddOpen} onOpenChange={setIsAddOpen}>
-          <DialogTrigger asChild>
-            <Button size="icon" className="rounded-full shadow-lg">
-              <Plus className="h-6 w-6" />
-            </Button>
-          </DialogTrigger>
+        <div className="flex gap-2">
+          <Button variant="outline" size="sm" onClick={handleSyncOSHA} disabled={isSyncing}>
+            {isSyncing ? "Syncing..." : "Sync OSHA"}
+          </Button>
+          <Dialog open={isAddOpen} onOpenChange={setIsAddOpen}>
+            <DialogTrigger asChild>
+              <Button size="icon" className="rounded-full shadow-lg">
+                <Plus className="h-6 w-6" />
+              </Button>
+            </DialogTrigger>
           <DialogContent className="sm:max-w-[425px]">
             <DialogHeader>
               <DialogTitle>Add Compliance Deadline</DialogTitle>
@@ -125,6 +163,7 @@ export default function Deadlines() {
             </Form>
           </DialogContent>
         </Dialog>
+        </div>
       </div>
 
       <div className="space-y-4">

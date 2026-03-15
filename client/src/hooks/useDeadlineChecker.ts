@@ -7,8 +7,10 @@ import { toast } from 'sonner'; // Assuming sonner or similar is used for toasts
 export function useDeadlineChecker() {
   const { user } = useAuth();
   const allDeadlines: any[] = (useTable(tables.compliance_deadlines) as any) || [];
+  const allSdsDocs: any[] = (useTable(tables.sds_documents) as any) || [];
   const logDeadlineReminder = useReducer(reducers.logDeadlineReminder);
   const processedDeadlines = useRef<Set<number>>(new Set());
+  const processedSds = useRef<Set<number>>(new Set());
 
   const shopId = user?.shopId?.toHexString();
 
@@ -23,10 +25,13 @@ export function useDeadlineChecker() {
     const checkDeadlines = () => {
       const now = new Date();
       const nextWeek = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
+      const nextMonth = new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000);
 
       const shopDeadlines = allDeadlines.filter(
         d => d.shopId.toHexString() === shopId && d.status !== 'Completed'
       );
+
+      const shopSdsDocs = allSdsDocs.filter(d => d.shopId.toHexString() === shopId);
 
       shopDeadlines.forEach(deadline => {
         if (processedDeadlines.current.has(deadline.id)) return;
@@ -49,10 +54,33 @@ export function useDeadlineChecker() {
           processedDeadlines.current.add(deadline.id);
         }
       });
+
+      shopSdsDocs.forEach(sds => {
+        if (processedSds.current.has(sds.id)) return;
+
+        const expiryDate = new Date(Number(sds.expiryDate.toMillis()));
+        let message = '';
+        let type: 'overdue' | 'upcoming' | null = null;
+
+        if (expiryDate < now) {
+          message = `EXPIRED SDS: ${sds.filename} has expired!`;
+          type = 'overdue';
+        } else if (expiryDate < nextMonth) {
+          message = `EXPIRING SDS: ${sds.filename} expires on ${expiryDate.toLocaleDateString()}`;
+          type = 'upcoming';
+        }
+
+        if (type) {
+          showNotification(message, type);
+          // Re-using the deadline reminder log for simplicity, could create a dedicated log action if needed
+          logDeadlineReminder({ deadlineId: sds.id, message });
+          processedSds.current.add(sds.id);
+        }
+      });
     };
 
     checkDeadlines();
-  }, [allDeadlines, shopId, logDeadlineReminder]);
+  }, [allDeadlines, allSdsDocs, shopId, logDeadlineReminder]);
 }
 
 function showNotification(message: string, type: 'overdue' | 'upcoming') {

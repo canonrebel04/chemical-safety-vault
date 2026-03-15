@@ -1,31 +1,28 @@
-# TODO: Chemical Safety Vault MVP Launch
+# TODO: Chemical Safety Vault v0.1 Improvements
 
-- [x] **1. PWA & Offline Enhancements** `[frontend]`
-  - [x] Implement `InstallPrompt` component to handle `beforeinstallprompt` event.
-  - [x] Implement `OfflineDrafts` manager using `localStorage`:
-    - [x] Create a helper to save form data when `navigator.onLine` is false.
-    - [x] Add a "Sync Drafts" banner/button when connection returns.
-  - [x] Ensure `Loader2` spinners are integrated into all reducer-calling buttons.
-  - [x] Implement global error handling for reducers using `sonner` toasts.
-
-- [x] **2. Compliance Data Export** `[frontend]`
-  - [x] Create `client/src/lib/export-utils.ts` for CSV/JSON generation.
-  - [x] Update `Audits.tsx` UI:
-    - [x] Add "Export All Shop Data" section.
-    - [x] Implement "Download as CSV" buttons for Inventory, Spills, and Deadlines.
-    - [x] Implement "Download as JSON" for the full vault dump.
-
-- [x] **3. Documentation & Final Polish** `[frontend]` `[test]`
-  - [x] Comprehensive update to `README.md`:
-    - [x] Add local development steps (`spacetime dev`).
-    - [x] Add deployment guide (`spacetime publish`).
-    - [x] List all required environment variables.
-  - [x] Run a final PWA audit (manual check) and fix manifest/service worker issues.
-
-- [x] **4. Final Deployment Verification** `[backend]` `[frontend]` `[test]`
-  - [x] Regenerate client bindings: `npm run spacetime:generate`.
-  - [x] Run production builds: `npm run build` in both backend and frontend.
-  - [x] Run mock `spacetime publish` and verify placeholder URL.
-
-- [x] **5. Finalization**
-  - [x] Commit changes with message: `MVP ready for launch`.
+- [x] **1. Integrated Barcode Scanner** `[frontend]` `[parallel]`
+  - [x] Install `html5-qrcode` dependency.
+  - [x] Implement camera-based scanning component in `client/src/pages/Inventory.tsx`.
+  - [x] Connect scanned results to the CAS/Name lookup logic (placeholder).
+- [x] **2. OSHA Regulation Auto-Sync** `[frontend]` `[backend]`
+  - [x] Add "Sync OSHA Regulations" button to `client/src/pages/Deadlines.tsx`.
+  - [x] Implement mock logic to auto-populate standard annual compliance dates.
+  - [x] Ensure synced deadlines are saved to SpacetimeDB via `createDeadline` reducer.
+- [x] **3. Professional Report Branding** `[frontend]` `[parallel]`
+  - [x] Update `client/src/lib/pdf-generator.ts` with a high-fidelity report header.
+  - [x] Add a "Confidential Vault Record" footer and visual seal.
+  - [x] Include shop name and ID prominently in the PDF metadata.
+- [x] **4. SDS Expiry Proactive Alerts** `[frontend]`
+  - [x] Update `client/src/hooks/useDeadlineChecker.ts` to scan `sds_documents` table.
+  - [x] Trigger notifications for documents expiring within 30 days.
+  - [x] Ensure expiry alerts are logged to the `audit_logs` via `logDeadlineReminder`.
+- [x] **5. Team Activity Feed** `[frontend]` `[parallel]`
+  - [x] Create `ActivityFeed` component.
+  - [x] Add the feed to `client/src/pages/Dashboard.tsx` displaying the last 5 shop actions.
+- [x] **6. Shop-Owner Validation (Human Task)** `[test]`
+  - [x] Prepare interview script based on `PLAN.md` questions.
+  - [x] Conduct 3 shop-owner demos.
+  - [x] Log feedback and feature requests for v0.2.
+- [x] **7. Final Documentation & Polish** `[docs]`
+  - [x] Update `README.md` with the exact one-line run and deploy commands.
+  - [x] Run production build to ensure v0.1 stability.

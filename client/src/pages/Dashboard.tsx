@@ -4,6 +4,7 @@ import { useTable } from 'spacetimedb/react';
 import { tables } from '@/module_bindings';
 
 import { useAuth } from '@/contexts/AuthContext';
+import { ActivityFeed } from '@/components/ActivityFeed';
 
 export default function Dashboard() {
   const { user } = useAuth();
@@ -72,6 +73,10 @@ export default function Dashboard() {
             <p className="text-sm text-muted-foreground">No items in inventory.</p>
           )}
         </div>
+      </div>
+
+      <div className="pt-4 border-t border-border">
+        <ActivityFeed />
       </div>
     </div>
   );
