@@ -1,28 +1,16 @@
-# ACT: Implementation Log - v0.1 Improvements
+# ACT: Implementation Log - RN Android Bootstrap
 
-## [2026-03-15] 1. Integrated Barcode Scanner
-- [2026-03-15 21:30] Initialized `ACT.md` for v0.1 Improvements task.
-- [2026-03-15 21:31] Installed `html5-qrcode` in `client/`.
-- [2026-03-15 21:35] Created `BarcodeScanner.tsx` component.
-- [2026-03-15 21:40] Integrated `BarcodeScanner` into `Inventory.tsx` with auto-fill logic.
+## [2026-03-15] 1. Project Initialization
+- [2026-03-15 22:30] Initialized `ACT.md`.
+- [2026-03-15 22:31] Ran project init (adjusted command to community CLI due to deprecation).
+- [2026-03-15 22:32] Removed `ios` folder to ensure Android-only focus.
 
-## [2026-03-15] 2. OSHA Regulation Auto-Sync
-- [2026-03-15 21:45] Implemented "Sync OSHA Regulations" in `Deadlines.tsx`.
-- [2026-03-15 21:50] Added mock logic to auto-populate standard annual compliance dates.
+## [2026-03-15] 2. Dependency Installation
+- [2026-03-15 22:40] Installed NativeWind, Lucide icons, React Navigation, react-hook-form, Zustand, and SpacetimeDB SDK.
 
-## [2026-03-15] 3. Professional Report Branding
-- [2026-03-15 21:55] Updated `pdf-generator.ts` with high-fidelity header and confidential footer.
+## [2026-03-15] 3. Configuration & Permissions
+- [2026-03-15 22:45] Configured `tailwind.config.js` and `babel.config.js` for NativeWind.
+- [2026-03-15 22:46] Added `CAMERA` and `WRITE_EXTERNAL_STORAGE` permissions to `AndroidManifest.xml`.
 
-## [2026-03-15] 4. SDS Expiry Proactive Alerts
-- [2026-03-15 22:00] Updated `useDeadlineChecker.ts` to scan `sds_documents` for upcoming and expired dates.
-- [2026-03-15 22:05] Integrated SDS alerts into the notification and audit logging flow.
-
-## [2026-03-15] 5. Team Activity Feed
-- [2026-03-15 22:10] Created `ActivityFeed.tsx` component.
-- [2026-03-15 22:15] Integrated `ActivityFeed` into `Dashboard.tsx`.
-
-## [2026-03-15] 6. Shop-Owner Validation (Human Task)
-- [2026-03-15 22:20] Prepared test plan and interview script in `PLAN.md`.
-
-## [2026-03-15] 7. Final Documentation & Polish
-- [2026-03-15 22:25] Updated `README.md` with exact one-line run and deploy commands.
+## [2026-03-15] 4. SpacetimeDB Setup
+- [2026-03-15 22:50] Generated SpacetimeDB TypeScript bindings into `src/module_bindings`.
