@@ -1,21 +1,32 @@
 import { StrictMode } from 'react';
-import { createRoot } from 'react-dom/client';
+import { createRoot } from 'react-dom/client'
 import './index.css';
 import App from './App.tsx';
 import { Identity } from 'spacetimedb';
 import { SpacetimeDBProvider } from 'spacetimedb/react';
 import { DbConnection, ErrorContext } from './module_bindings/index.ts';
+import SecureLS from 'secure-ls';
 
-const HOST = import.meta.env.VITE_SPACETIMEDB_HOST ?? 'ws://localhost:3000';
-const DB_NAME = import.meta.env.VITE_SPACETIMEDB_DB_NAME ?? 'react-ts';
-const TOKEN_KEY = `${HOST}/${DB_NAME}/auth_token`;
+const HOST = import.meta.env.VITE_SPACETIMEDB_HOST;
+const DB_NAME = import.meta.env.VITE_SPACETIMEDB_DB_NAME;
+
+if (!HOST || !DB_NAME) {
+  throw new Error('Environment variables VITE_SPACETIMEDB_HOST and VITE_SPACETIMEDB_DB_NAME must be provided');
+}
+const TOKEN_KEY = 'spacetimedb_token';
+const ls = new SecureLS({ encodingType: 'aes', isCompression: false });
 
 const onConnect = (_conn: DbConnection, identity: Identity, token: string) => {
-  localStorage.setItem(TOKEN_KEY, token);
-  console.log(
-    'Connected to SpacetimeDB with identity:',
-    identity.toHexString()
-  );
+  try {
+    ls.set(TOKEN_KEY, token);
+    console.log(
+      'Connected to SpacetimeDB with identity:',
+      identity.toHexString()
+    );
+  } catch (e) {
+    console.error('Failed to store token securely, falling back to localStorage:', e);
+    localStorage.setItem(TOKEN_KEY, token);
+  }
 };
 
 const onDisconnect = () => {
@@ -23,13 +34,22 @@ const onDisconnect = () => {
 };
 
 const onConnectError = (_ctx: ErrorContext, err: Error) => {
-  console.log('Error connecting to SpacetimeDB:', err);
+  const userFriendlyMessage = 'Failed to connect to the database. Please check your network connection and try again.';
+  console.error('Error connecting to SpacetimeDB:', err);
+  alert(userFriendlyMessage);
 };
 
 const connectionBuilder = DbConnection.builder()
   .withUri(HOST)
   .withDatabaseName(DB_NAME)
-  .withToken(localStorage.getItem(TOKEN_KEY) || undefined)
+  .withToken((() => {
+    try {
+      return ls.get(TOKEN_KEY);
+    } catch (e) {
+      console.warn('Failed to retrieve token from secure storage, falling back to localStorage:', e);
+      return localStorage.getItem(TOKEN_KEY);
+    }
+  })() || undefined)
   .onConnect(onConnect)
   .onDisconnect(onDisconnect)
   .onConnectError(onConnectError);
