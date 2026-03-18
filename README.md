@@ -181,3 +181,4 @@ Distributed under the **ISC License**. See `client/LICENSE` for more information
 ---
 
 *Built with ❤️ for the workshop community using SpacetimeDB.*
+# Test CI workflow
